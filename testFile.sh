@@ -4,6 +4,8 @@
 
 duplicateRatio=10 # 10%
 vaccinateRatio=50 # 50%
+firstNameFile="firstNames"
+lastNameFile="lastNames"
 outputFile="citizenRecordsFile"
 # We accept IDs up to 4 digits thus ID<10000
 # Above that, we can't ensure unique IDs
@@ -30,17 +32,13 @@ done
 
 ################### Check Input
 
-if [ -f "$virusList" ]; then
-  :
-else
+if [ ! -f "$virusList" ]; then
   echo "Virus file not found."
   printf "Correct Usage:\n./testFile.sh [virusesFile] [countriesFile] [numLines] [duplicatesAllowed]\n"
   exit 1
 fi
 
-if [ -f "$countryList" ]; then
-  :
-else
+if [ ! -f "$countryList" ]; then
   echo "Country file not found."
   printf "Correct Usage:\n./testFile.sh [virusesFile] [countriesFile] [numLines] [duplicatesAllowed]\n"
   exit 2
@@ -62,9 +60,9 @@ echo "Input was: $1, $2, $3, $4"
 
 ################### Check Input
 
-START=$(date +%s.%N) # Start clock
+start=$(date +%s.%N) # Start clock
 
-################### Get length of file records
+################### Get the file records data
 
 # Virus file
 declare -a virusArray;
@@ -84,7 +82,7 @@ printf "Country Records: %3d\n" $((${#countryArray[@]}))
 
 # First names file
 declare -a firstNamesArray;
-file="firstNames"
+file="$firstNameFile"
 while read line; do
 firstNamesArray+=("$line");
 done < $file
@@ -92,20 +90,20 @@ printf "First names:\t %4d\n" $((${#firstNamesArray[@]}))
 
 # Last names file
 declare -a lastNamesArray;
-file="lastNames"
+file="$lastNameFile"
 while read line; do
 lastNamesArray+=("$line");
 done < $file
 printf "Last names:\t %4d\n" $((${#lastNamesArray[@]}))
 
-################### Get length of file records
+################### Get the file records data
 
 
 ################### Prepare for main loop
 
 # Check if file already exists
 if [ -f "$outputFile" ]; then
-rm -f $outputFile
+  rm -f $outputFile
 fi
 touch $outputFile
 
@@ -115,8 +113,8 @@ declare -a usedIdArray;
 declare -a unusedIdArray;
 if [[ $duplicates -eq 0 ]]; then
   # Fill up with all possible unused IDs (0-9999)
-  for ((it=0; it<maxID; it++)) do
-    unusedIdArray+=($it)
+  for ((i=0; i<maxID; i++)) do
+    unusedIdArray+=($i)
   done
 fi
 # Array that keeps ID firstName lastName country age of all records
@@ -151,9 +149,11 @@ for ((counter=0; counter<$lines ;counter++)) do
       for k in "${!associativeRecords[@]}"; do
         [[ ${associativeRecords[$k]} == $id ]] && key=$k
       done
-      # Keep the number of record in associative array
+      # Keep the key of the record in associative array
       # in order to retrieve the rest info with it
-      key=${key:2} # key = id@ ---> key:2 = @
+      [[ "${key::2}" == "id" ]] && key=${key:2} || key=${key:3}
+      # for IDs<120 we might have collision of keys when $id==$age_key
+      # in associative array so we need to parse the key apropriately
       firstName=${associativeRecords[name$key]}
       lastName=${associativeRecords[surname$key]}
       country=${associativeRecords[country$key]}
@@ -179,22 +179,22 @@ for ((counter=0; counter<$lines ;counter++)) do
 
   # Check if we need to add a date
   if [ "$status" = "YES" ]; then
-    let "dd=$RANDOM%30 + 1"
-    let "mm=$RANDOM%12 + 1"
-    let "yyyy=$RANDOM%22 +2000"
+    dd=$(($RANDOM%30 + 1))
+    mm=$(($RANDOM%12 + 1))
+    yyyy=$(($RANDOM%22 +2000))
     date="$dd-$mm-$yyyy"
     # Append the record to the output file
-    printf "$id"" ""$firstName"" ""$lastName"" ""$country"" ""$age"" ""$virus"" ""$status"" ""$date\n" >> $outputFile
+    echo $id $firstName $lastName $country $age $virus $status $date >> $outputFile
   else
     # Append the record to the output file without date
-    printf "$id"" ""$firstName"" ""$lastName"" ""$country"" ""$age"" ""$virus"" ""$status\n" >> $outputFile
+    echo $id $firstName $lastName $country $age $virus $status >> $outputFile
   fi
 
 done
 
-END=$(date +%s.%N) # Stop clock
-DIFF=$(echo "$END - $START" | bc)
-echo "Script runned for" $DIFF "seconds"
+end=$(date +%s.%N) # Stop clock
+runningTime=$(echo "$end - $start" | bc)
+echo "Script runned for" $runningTime "seconds"
 echo "Output stored in" $outputFile
 
 ################### End Main Loop
