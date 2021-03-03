@@ -2,9 +2,12 @@
 
 ################### Defined values
 
-duplicateRatio=50 # 50%
+duplicateRatio=10 # 10%
 vaccinateRatio=50 # 50%
 outputFile="citizenRecordsFile"
+# We accept IDs up to 4 digits thus ID<10000
+# Above that, we can't ensure unique IDs
+maxID=10000
 
 ################### Defined values
 
@@ -106,47 +109,69 @@ rm -f $outputFile
 fi
 touch $outputFile
 
-# We accept IDs up to 4 digits thus ID<10000
-# Above that, we can't ensure unique IDs
-maxID="$(($lines < 10000 ? $lines : 10000))"
 # Array of existing IDs in record file
 declare -a usedIdArray;
-# Array of unused IDs.
+# Array of unused IDs
 declare -a unusedIdArray;
-# Fill up with all unused IDs
-for ((it=0; it<lines; it++)) do
-  unusedIdArray+=($it)
-done
+if [[ $duplicates -eq 0 ]]; then
+  # Fill up with all possible unused IDs (0-9999)
+  for ((it=0; it<maxID; it++)) do
+    unusedIdArray+=($it)
+  done
+fi
+# Array that keeps ID firstName lastName country age of all records
+declare -A associativeRecords;
 
 ################### Prepare for main loop
 
 
 ################### Main Loop
 
-for ((counter=lines; counter>0 ;counter--)) do
+for ((counter=0; counter<$lines ;counter++)) do
 
-  ### Case: Avoid duplicate IDs
   if [[ $duplicates -eq 0 ]]; then
+  ### Case: Avoid duplicate IDs
     # Find a random index in the remaining IDs array and claim its value
-    id=${unusedIdArray[ $(($RANDOM % ${#unusedIdArray[@]})) ]}
+    index=$(($RANDOM % ${#unusedIdArray[@]}))
+    id=${unusedIdArray[ $index ]}
+    # Remove the indexed ID from the array so it can't be reused
+    unusedIdArray=( "${unusedIdArray[@]::$index}" "${unusedIdArray[@]:$((index+1))}" )
+    # Generate the rest info
+    firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]} + 1))]}
+    lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]} + 1))]}
+    country=${countryArray[(($RANDOM % ${#countryArray[@]} + 1))]}
+    age=$(($RANDOM%120 + 1))
   else
   ### Case: Cause duplicate IDs on purpose
-    # Decide to generate a duplicate based on the defined possibility
-    # ONLY IF there's at least one record already
     if [[ "$((RANDOM%100 + 1))" -lt $duplicateRatio && ${#usedIdArray[@]} -gt 0 ]]; then
-      id=${usedIdArray[ $RANDOM % ${#usedIdArray[@]} ]}
+    ### Decide to generate a duplicate based on the defined possibility
+    ### ONLY IF there's at least one record already
+      id=${usedIdArray[$(($RANDOM%${#usedIdArray[@]}))]}
+      # Find the key of the record-to-copy by its ID
+      for k in "${!associativeRecords[@]}"; do
+        [[ ${associativeRecords[$k]} == $id ]] && key=$k
+      done
+      # Keep the number of record in associative array
+      # in order to retrieve the rest info with it
+      key=${key:2} # key = id@ ---> key:2 = @
+      firstName=${associativeRecords[name$key]}
+      lastName=${associativeRecords[surname$key]}
+      country=${associativeRecords[country$key]}
+      age=$((${associativeRecords[age$key]}))
     else
-      id=$(($RANDOM%$maxID)) # Only used for first record
+    ### Only used for first record - Generate an original record
+      id=$(($RANDOM%$maxID))
+      firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]} + 1))]}
+      lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]} + 1))]}
+      country=${countryArray[(($RANDOM % ${#countryArray[@]} + 1))]}
+      age=$(($RANDOM%120 + 1))
     fi
+    # Store in the usedIdArray so we know this ID is used
+    usedIdArray+=($id)
+    # Store the whole record info in the associative array for future duplication
+    associativeRecords+=([id$counter]=$id [name$counter]=$firstName [surname$counter]=$lastName [country$counter]=$country [age$counter]=$age)
   fi
 
-  # Store in the usedIdArray so we know this ID is used
-  usedIdArray+=($id)
-
-  firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
-  lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
-  country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
-  age=$(($RANDOM%120 + 1))
   virus=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
 
   # Decide for a vaccination certificate based on the defined possibility
@@ -170,5 +195,6 @@ done
 END=$(date +%s.%N) # Stop clock
 DIFF=$(echo "$END - $START" | bc)
 echo "Script runned for" $DIFF "seconds"
+echo "Output stored in" $outputFile
 
 ################### End Main Loop
