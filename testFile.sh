@@ -125,7 +125,7 @@ declare -A associativeRecords;
 
 ################### Main Loop
 
-for ((counter=0; counter<$lines ;counter++)) do
+for ((counter=0; counter<$lines; counter++)) do
 
   if [[ $duplicates -eq 0 ]]; then
   ### Case: Avoid duplicate IDs
