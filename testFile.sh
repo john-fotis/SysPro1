@@ -70,7 +70,7 @@ file="$virusList"
 while read line; do
 virusArray+=("$line");
 done < $file
-printf "Virus Records:\t %2d\n" $((${#virusArray[@]}))
+printf "Virus Records:\t %d\n" $((${#virusArray[@]}))
 
 # Country file
 declare -a countryArray;
@@ -78,7 +78,7 @@ file="$countryList"
 while read line; do
 countryArray+=("$line");
 done < $file
-printf "Country Records: %3d\n" $((${#countryArray[@]}))
+printf "Country Records: %d\n" $((${#countryArray[@]}))
 
 # First names file
 declare -a firstNamesArray;
@@ -86,7 +86,7 @@ file="$firstNameFile"
 while read line; do
 firstNamesArray+=("$line");
 done < $file
-printf "First names:\t %4d\n" $((${#firstNamesArray[@]}))
+printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
 
 # Last names file
 declare -a lastNamesArray;
@@ -94,7 +94,7 @@ file="$lastNameFile"
 while read line; do
 lastNamesArray+=("$line");
 done < $file
-printf "Last names:\t %4d\n" $((${#lastNamesArray[@]}))
+printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
 
 ################### Get the file records data
 
