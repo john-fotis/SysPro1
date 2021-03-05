@@ -2,8 +2,8 @@
 
 ################### Defined values
 
-duplicateRatio=10 # 10%
-vaccinateRatio=50 # 50%
+duplicateRatio=50 # %
+vaccinateRatio=50 # %
 firstNameFile="firstNames"
 lastNameFile="lastNames"
 outputFile="citizenRecordsFile"
@@ -64,124 +64,120 @@ start=$(date +%s.%N) # Start clock
 
 ################### Get the file records data
 
-# Virus file
+# Viruses file
 declare -a virusArray;
 file="$virusList"
-while read line; do
-virusArray+=("$line");
-done < $file
+while read line; do virusArray+=("$line"); done < $file
 printf "Virus Records:\t %d\n" $((${#virusArray[@]}))
 
-# Country file
+# Countries file
 declare -a countryArray;
 file="$countryList"
-while read line; do
-countryArray+=("$line");
-done < $file
+while read line; do countryArray+=("$line"); done < $file
 printf "Country Records: %d\n" $((${#countryArray[@]}))
 
 # First names file
 declare -a firstNamesArray;
 file="$firstNameFile"
-while read line; do
-firstNamesArray+=("$line");
-done < $file
+while read line; do firstNamesArray+=("$line"); done < $file
 printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
 
 # Last names file
 declare -a lastNamesArray;
 file="$lastNameFile"
-while read line; do
-lastNamesArray+=("$line");
-done < $file
+while read line; do lastNamesArray+=("$line"); done < $file
 printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
 
 ################### Get the file records data
 
 
-################### Prepare for main loop
+################### Declare variables that we'll use
 
-# Check if file already exists
-if [ -f "$outputFile" ]; then
-  rm -f $outputFile
-fi
+# Check if output file already exists and if so, delete it
+[[ -f "$outputFile" ]] && rm -f $outputFile
 touch $outputFile
 
-# Array of existing IDs in record file
-declare -a usedIdArray;
 # Array of unused IDs
 declare -a unusedIdArray;
+# Array that keeps |ID-firstName-lastName-country-age| of all original records
+declare -A originalRecords;
+# An original record is one that its info was not copied from another record
+availableIdAmount=$maxID
+
 if [[ $duplicates -eq 0 ]]; then
   # Fill up with all possible unused IDs (0-9999)
-  for ((i=0; i<maxID; i++)) do
-    unusedIdArray+=($i)
-  done
+  for ((i=0; i<$maxID; i++)) do unusedIdArray+=($i); done
+else
+  # Generate the first original record
+  id=$(($RANDOM%$maxID))
+  firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
+  lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
+  country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
+  age=$(($RANDOM%120+1))
+  # Store the whole record info in the associative array for future duplication
+  originalRecords+=([id0]=$id [name0]=$firstName [surname0]=$lastName [country0]=$country [age0]=$age)
+  originalNo=1
 fi
-# Array that keeps ID firstName lastName country age of all records
-declare -A associativeRecords;
 
-################### Prepare for main loop
+################### Declare variables that we'll use
 
 
-################### Main Loop
+################### Start Main Loop
 
 for ((counter=0; counter<$lines; counter++)) do
 
   if [[ $duplicates -eq 0 ]]; then
   ### Case: Avoid duplicate IDs
     # Find a random index in the remaining IDs array and claim its value
-    index=$(($RANDOM % ${#unusedIdArray[@]}))
-    id=${unusedIdArray[ $index ]}
-    # Remove the indexed ID from the array so it can't be reused
-    unusedIdArray=( "${unusedIdArray[@]::$index}" "${unusedIdArray[@]:$((index+1))}" )
+    index=$(($RANDOM%$availableIdAmount))
+    id=${unusedIdArray[$index]}
+    # After claiming this ID, we can swap it with the last one in the array
+    # and reduce the size of the array virtually by 1
+    unusedIdArray[$index]=${unusedIdArray[$availableIdAmount-1]}
+    let "availableIdAmount--"
     # Generate the rest info
-    firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]} + 1))]}
-    lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]} + 1))]}
-    country=${countryArray[(($RANDOM % ${#countryArray[@]} + 1))]}
-    age=$(($RANDOM%120 + 1))
+    firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
+    lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
+    country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
+    age=$(($RANDOM%120+1))
   else
-  ### Case: Cause duplicate IDs on purpose
-    if [[ "$((RANDOM%100 + 1))" -lt $duplicateRatio && ${#usedIdArray[@]} -gt 0 ]]; then
-    ### Decide to generate a duplicate based on the defined possibility
-    ### ONLY IF there's at least one record already
-      id=${usedIdArray[$(($RANDOM%${#usedIdArray[@]}))]}
-      # Find the key of the record-to-copy by its ID
-      for k in "${!associativeRecords[@]}"; do
-        [[ ${associativeRecords[$k]} == $id ]] && key=$k
-      done
-      # Keep the key of the record in associative array
-      # in order to retrieve the rest info with it
-      [[ "${key::2}" == "id" ]] && key=${key:2} || key=${key:3}
-      # for IDs<120 we might have collision of keys when $id==$age_key
-      # in associative array so we need to parse the key apropriately
-      firstName=${associativeRecords[name$key]}
-      lastName=${associativeRecords[surname$key]}
-      country=${associativeRecords[country$key]}
-      age=$((${associativeRecords[age$key]}))
-    else
-    ### Only used for first record - Generate an original record
+  ### Case: Cause duplicate IDs on purpose based on defined possibility
+    if [[ "$((RANDOM%100))" -gt $duplicateRatio ]]; then
+    ### Case: Generate an original record
       id=$(($RANDOM%$maxID))
-      firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]} + 1))]}
-      lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]} + 1))]}
-      country=${countryArray[(($RANDOM % ${#countryArray[@]} + 1))]}
-      age=$(($RANDOM%120 + 1))
+      firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
+      lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
+      country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
+      age=$(($RANDOM%120+1))
+      # Store the whole record info in the associative array for future duplication
+      originalRecords+=([id$originalNo]=$id [name$originalNo]=$firstName [surname$originalNo]=$lastName [country$originalNo]=$country [age$originalNo]=$age)
+      let "originalNo++"
+    else
+    ### Case: Generate a duplicate record
+      index=$(($RANDOM%$originalNo))
+      id=${originalRecords[id$index]}
+      # Find the key of the record-to-copy by its ID
+      for k in "${!originalRecords[@]}"; do
+        [[ ${k::2} == "id" ]] && [[ ${originalRecords[$k]} == $id ]] && key=${k:2}
+        # Parse the key from the original record that has the ID we want.
+        # For IDs<120 we might have collision of keys when $id==$age_key
+        # among the record info, so we need to parse the key apropriately
+      done
+      firstName=${originalRecords[name$key]}
+      lastName=${originalRecords[surname$key]}
+      country=${originalRecords[country$key]}
+      age=$((${originalRecords[age$key]}))
     fi
-    # Store in the usedIdArray so we know this ID is used
-    usedIdArray+=($id)
-    # Store the whole record info in the associative array for future duplication
-    associativeRecords+=([id$counter]=$id [name$counter]=$firstName [surname$counter]=$lastName [country$counter]=$country [age$counter]=$age)
   fi
 
   virus=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
 
   # Decide for a vaccination certificate based on the defined possibility
-  [[ $(($RANDOM%100 + 1)) < $vaccinateRatio ]] && status="YES" || status="NO"
+  [[ $(($RANDOM%100)) < $vaccinateRatio ]] && status="YES" || status="NO"
 
   # Check if we need to add a date
   if [ "$status" = "YES" ]; then
-    dd=$(($RANDOM%30 + 1))
-    mm=$(($RANDOM%12 + 1))
-    yyyy=$(($RANDOM%22 +2000))
+    dd=$(($RANDOM%30+1)); mm=$(($RANDOM%12+1)); yyyy=$(($RANDOM%22+2000))
     date="$dd-$mm-$yyyy"
     # Append the record to the output file
     echo $id $firstName $lastName $country $age $virus $status $date >> $outputFile
@@ -189,9 +185,13 @@ for ((counter=0; counter<$lines; counter++)) do
     # Append the record to the output file without date
     echo $id $firstName $lastName $country $age $virus $status >> $outputFile
   fi
+  
+  [[ -z "$firstName" ]] && echo $id name
+  [[ -z "$lastName" ]] && echo $id surname
+  [[ -z "$country" ]] && echo $id country
 
 done
-
+echo $bla
 end=$(date +%s.%N) # Stop clock
 runningTime=$(echo "$end - $start" | bc)
 echo "Script runned for" $runningTime "seconds"
