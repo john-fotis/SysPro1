@@ -1,6 +1,5 @@
-#pragma once
-#ifndef __SKIPLIST__
-#define __SKIPLIST__
+#ifndef __SKIPLIST__HPP
+#define __SKIPLIST__HPP
 
 class skipList {
 private:

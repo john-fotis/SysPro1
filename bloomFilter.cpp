@@ -1,4 +1,5 @@
-#include "bloomFilter.h"
+#include "bloomFilter.hpp"
+// #include "hashFunctions.hpp"
 
 bloomFilter::bloomFilter(/* args */) {
   

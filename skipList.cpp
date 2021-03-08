@@ -1,4 +1,4 @@
-#include "skipList.h"
+#include "skipList.hpp"
 
 skipList::skipList(/* args */) {
   
