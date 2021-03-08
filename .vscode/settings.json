@@ -1,0 +1,18 @@
+{
+  "files.associations": {
+    "initializer_list": "cpp",
+    "limits": "cpp",
+    "type_traits": "cpp",
+    "*.tcc": "cpp",
+    "deque": "cpp",
+    "string": "cpp",
+    "unordered_map": "cpp",
+    "vector": "cpp",
+    "ostream": "cpp",
+    "utility": "cpp",
+    "string_view": "cpp"
+  },
+  "cSpell.words": [
+    "stoi"
+  ]
+}
