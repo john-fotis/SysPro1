@@ -185,13 +185,9 @@ for ((counter=0; counter<$lines; counter++)) do
     # Append the record to the output file without date
     echo $id $firstName $lastName $country $age $virus $status >> $outputFile
   fi
-  
-  [[ -z "$firstName" ]] && echo $id name
-  [[ -z "$lastName" ]] && echo $id surname
-  [[ -z "$country" ]] && echo $id country
 
 done
-echo $bla
+
 end=$(date +%s.%N) # Stop clock
 runningTime=$(echo "$end - $start" | bc)
 echo "Script runned for" $runningTime "seconds"
