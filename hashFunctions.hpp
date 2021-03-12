@@ -1,7 +1,7 @@
 #ifndef HASHFUNCTIONS_HPP
 #define HASHFUNCTIONS_HPP
 
-#include <stdio.h>
+#include <cstdio>
 
 /*
 This algorithm (k=33) was first reported by dan bernstein many years 

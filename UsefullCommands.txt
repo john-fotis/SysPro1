@@ -1,5 +1,0 @@
-Input type:
-[citizenID] [firstName] [lastName] [country] [age] [virusName] [YES/NO] (date)
-
-testFile.sh:
-./testFile.sh [virusesFile] [countriesFile] [numLines] [duplicatesAllowed]
