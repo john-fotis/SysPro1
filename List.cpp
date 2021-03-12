@@ -1,11 +1,14 @@
 #include <iostream>
+
 #include "List.hpp"
+#include "Person.hpp"
+#include "Virus.hpp"
+#include "Country.hpp"
 #include "Record.hpp"
 
 template <typename T>
 void List<T>::insertFirst(T data) {
-  listNode<T> *node = new listNode<T>();
-  node->data = data;
+  listNode *node = createNode(data);
   if (!this->head) {
     node->next = NULL;
     this->tail = node;
@@ -18,8 +21,7 @@ void List<T>::insertFirst(T data) {
 
 template <typename T>
 void List<T>::insertLast(T data) {
-  listNode<T> *node = new listNode<T>();
-  node->data = data;
+  listNode *node = createNode(data);
   if (!this->head) {
     this->head = node;
   } else {
@@ -38,10 +40,9 @@ void List<T>::insertAscending(T data) {
   } else if (this->size == 1) {
     (this->head->data >= data)? insertFirst(data):insertLast(data);
   } else {
-    listNode<T> *node = new listNode<T>();
-    node->data = data;
-    listNode<T> *current = this->head;
-    listNode<T> *next = current->next;
+    listNode *node = createNode(data);
+    listNode *current = this->head;
+    listNode *next = current->next;
     for (; next->data < data; next = current->next)
       current = current->next;
     node->next = next;
@@ -59,10 +60,9 @@ void List<T>::insertDescending(T data) {
   } else if (this->size == 1) {
     (this->head->data < data) ? insertFirst(data) : insertLast(data);
   } else {
-    listNode<T> *node = new listNode<T>();
-    node->data = data;
-    listNode<T> *current = this->head;
-    listNode<T> *next = current->next;
+    listNode *node = createNode(data);
+    listNode *current = this->head;
+    listNode *next = current->next;
     for (; next->data >= data; next = current->next)
       current = current->next;
     node->next = next;
@@ -74,7 +74,7 @@ void List<T>::insertDescending(T data) {
 template <typename T>
 void List<T>::popFirst() {
   if (empty()) return;
-  listNode<T> *temp = this->head;
+  listNode *temp = this->head;
   this->head = this->head->next;
   if (!this->head) {
     this->tail = NULL;
@@ -89,9 +89,9 @@ void List<T>::popFirst() {
 template <typename T>
 void List<T>::popLast() {
   if (empty()) return;
-  listNode<T> *temp = this->tail;
+  listNode *temp = this->tail;
   if (this->head->next) {
-    listNode<T> *newTail = this->head;
+    listNode *newTail = this->head;
     while (newTail->next != this->tail)
       newTail = newTail->next;
     newTail->next = NULL;
@@ -111,7 +111,7 @@ void List<T>::popValue(T data) {
   } else if (this->tail->data == data) {
     popLast();
   } else {
-    listNode<T> *current = this->head, *previous = NULL;
+    listNode *current = this->head, *previous = NULL;
     while (current && current->data != data) {
       previous = current;
       current = current->next;
@@ -126,7 +126,7 @@ template <typename T>
 List<T> &List<T>::sortAscending(List<T> &l) {
   if (empty()) return *this;
   List<T> newList;
-  listNode<T> *temp = l.head;
+  listNode *temp = l.head;
   for (; temp; temp = temp->next)
     newList.insertAscending(temp->data);
   l.flush();
@@ -146,8 +146,8 @@ List<T> &List<T>::sortDescending(List<T> &l) {
 template <typename T>
 List<T> &List<T>::invert() {
   if(empty()) return *this;
-  listNode<T> *current = this->head;
-  listNode<T> *next = NULL, *previous = NULL;
+  listNode *current = this->head;
+  listNode *next = NULL, *previous = NULL;
   while (current) {
     next = current->next;
     current->next = previous;
@@ -161,16 +161,27 @@ List<T> &List<T>::invert() {
 template <typename T>
 void List<T>::print() const {
   if (empty()) return;
-  listNode<T> *temp = this->head;
+  listNode *temp = this->head;
   for (; temp->next; temp = temp->next)
     std::cout << temp->data << " ==> ";
   std::cout << temp->data << std::endl;
 }
 
 template <typename T>
-listNode<T> *List<T>::search(T data) const {
+T *List<T>::search(const T data) const {
   if (empty()) return NULL;
-  listNode<T> *temp = this->head;
+  listNode *temp = this->head;
+  T *ptr = NULL;
+  while (temp && temp->data != data)
+    temp = temp->next;
+  if (temp) ptr = &temp->data;
+  return ptr;
+}
+
+template <typename T>
+bool List<T>::contains(const T &data) const {
+  if (empty()) return false;
+  listNode *temp = this->head;
   while (temp && temp->data != data)
     temp = temp->next;
   return temp;
@@ -183,5 +194,8 @@ template class List<long>;
 template class List<float>;
 template class List<double>;
 template class List<std::string>;
+template class List<Person>;
+template class List<Virus>;
+template class List<Country>;
 template class List<Record>;
 // ... and so on ...
