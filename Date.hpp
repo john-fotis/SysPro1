@@ -3,49 +3,20 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "string.hpp"
+
+#include "StringLibrary.hpp"
 
 #define DAYS_PER_MONTH 30
+#define MONTHS_IN_YEAR 12
 
 class Date {
 private:
   int day, month, year;
-public:
-  Date(int d=1, int m=1, int y=2021) { day = d; month = m; year = y; }
-  // Gets a string formatted date and converts it to int
-  Date(std::string date) {
-    std::string d, m, y;
-    int i = 0, j = 0, count = 0;
-    for (i = 0; std::isdigit(date[i]); i++) count++;
-    d = date.substr(0, count);
-    count = 0;
-    j = i + 1;
-    for (i = i+1; std::isdigit(date[i]); i++) count++;
-    m = date.substr(j, count);
-    count = 0;
-    j = i + 1;
-    for (i = i+1; std::isdigit(date[i]); i++) count++;
-    y = date.substr(j, count);
-    day = std::atoi(d.c_str());
-    month = std::atoi(m.c_str());
-    year = std::atoi(y.c_str());
-  }
-  ~Date() {}
-  Date &operator=(const Date &date) {
-    if (this == &date) return *this;
-    int d, m, y;
-    date.get(d, m, y);
-    this->set(d, m, y);
-    return *this;
-  }
 
-  inline friend bool operator==(const Date &d1, const Date &d2);
-  inline friend bool operator!=(const Date &d1, const Date &d2);
-  inline friend bool operator<(const Date &d1, const Date &d2);
-  inline friend bool operator>(const Date &d1, const Date &d2);
-  inline friend bool operator<=(const Date &d1, const Date &d2);
-  inline friend bool operator>=(const Date &d1, const Date &d2);
-  inline friend std::ostream &operator<<(std::ostream &os, const Date &date);
+public:
+  Date(int d=0, int m=0, int y=0): day(d), month(m), year(y) {}
+  // Gets a string formatted date and converts it to int
+  Date(std::string date) { set(date); }
 
   void get(int &d, int &m, int &y) const { d = day; m = month; y = year; }
   void get(std::string &date) const {
@@ -56,24 +27,51 @@ public:
     date.append("-");
     date.append(toString(year));
   }
-  void set(int d, int m, int y) { day = d; month = m; year = y; }
+
+  void set(int d=0, int m=0, int y=0) { day = d; month = m; year = y; }
   void set(std::string date) {
-    std::string d, m, y;
-    int i = 0, j = 0, count = 0;
-    for (i = 0; std::isdigit(date[i]); i++) count++;
-    d = date.substr(0, count); count = 0;
-    j = i + 1;
-    for (i = i + 1; std::isdigit(date[i]); i++) count++;
-    m = date.substr(j, count);
-    count = 0;
-    j = i + 1;
-    for (i = i + 1; std::isdigit(date[i]); i++) count++;
-    y = date.substr(j, count);
-    day = std::atoi(d.c_str());
-    month = std::atoi(m.c_str());
-    year = std::atoi(y.c_str());
+    if (!date.compare("")) { day = month = year = 0; return; }
+    bool validDate = true;
+    std::string d(""), m(""), y("");
+    List<std::string> args;
+    splitLine(date, args, '-');
+    if (args.getSize() != 3) validDate = false;
+    else {
+      d = args.getFirst();
+      args.popFirst();
+      m = args.getFirst();
+      args.popFirst();
+      y = args.getFirst();
+    }
+
+    for(int pos = 0; pos < d.length(); pos++)
+      if (!std::isdigit(d[pos])) validDate = false;
+    for (int pos = 0; pos < m.length(); pos++)
+      if (!std::isdigit(m[pos])) validDate = false;
+    for (int pos = 0; pos < y.length(); pos++)
+      if (!std::isdigit(y[pos])) validDate = false;
+
+    if (validDate) {
+      day = myStoi(d.c_str());
+      month = myStoi(m.c_str());
+      year = myStoi(y.c_str());
+    } else day = month = year = 0;
   }
-  void print()const {std::cout << day << "-" << month << "-" << year << std::endl;}
+
+  inline friend bool operator==(const Date &d1, const Date &d2);
+  inline friend bool operator!=(const Date &d1, const Date &d2);
+  inline friend bool operator<(const Date &d1, const Date &d2);
+  inline friend bool operator>(const Date &d1, const Date &d2);
+  inline friend bool operator<=(const Date &d1, const Date &d2);
+  inline friend bool operator>=(const Date &d1, const Date &d2);
+  inline friend std::ostream &operator<<(std::ostream &os, const Date &date);
+
+  bool valid() const {
+    if (day < 1 || day > DAYS_PER_MONTH) return false;
+    if (month < 1 || month > MONTHS_IN_YEAR) return false;
+    return true;
+  }
+  void print() const {std::cout << day << "-" << month << "-" << year << std::endl;}
 };
 
 inline bool operator==(const Date &d1, const Date &d2) {
@@ -92,7 +90,7 @@ inline bool operator<(const Date &d1, const Date &d2) {
 }
 
 inline bool operator>(const Date &d1, const Date &d2) {
-  return (!(d1<d2) && d1!=d2);
+  return (!(d1<d2) && (d1!=d2));
 }
 
 inline bool operator<=(const Date &d1, const Date &d2) {
