@@ -1,6 +1,7 @@
 #include <iostream>
+
 #include "HashTable.hpp"
-#include "Record.hpp"
+#include "Person.hpp"
 
 template <typename T>
 void HashTable<T>::insert(unsigned int key, T node) {
@@ -17,6 +18,14 @@ void HashTable<T>::remove(unsigned int key, T node) {
 }
 
 template <typename T>
+T *HashTable<T>::search(unsigned int key, T node) {
+  unsigned long index = hashFunction(key);
+  T *temp = NULL;
+  temp = table[index].search(node);
+  return temp;
+}
+
+template <typename T>
 void HashTable<T>::print() const {
   for (int bucket=0; bucket<size; bucket++) {
     if (!table[bucket].empty()) {
@@ -27,15 +36,8 @@ void HashTable<T>::print() const {
   }
 }
 
-template <typename T>
-listNode<T> *HashTable<T>::search() const {
-  listNode<T> *temp = NULL;
-  return temp;
-}
-
 // Explicit initiation of template to help the compiler see it
-// template class HashTable<int>;
+template class HashTable<int>;
 template class HashTable<std::string>;
-template class HashTable<Record>;
-
+template class HashTable<Person>;
 // ... and so on ...
