@@ -1,8 +1,10 @@
+# ========== Run "make help" to see the available commands ==========
 CPP	= g++
 FLAGS	= -g -c -Wall -std=c++0x
-HEADER	= BloomFilter.hpp SkipList.hpp List.hpp HashTable.hpp Person.hpp Record.hpp Date.hpp StringLibrary.hpp hashFunctions.hpp Virus.hpp Country.hpp
-SOURCE	= main.cpp BloomFilter.cpp SkipList.cpp List.cpp HashTable.cpp Person.cpp Record.cpp Virus.cpp Country.cpp
-OBJS	= main.o BloomFilter.o SkipList.o List.o HashTable.o Person.o Record.o Virus.o Country.o
+HEADER	= BloomFilter.hpp SkipList.hpp List.hpp HashTable.hpp Person.hpp Record.hpp Date.hpp StringLibrary.hpp hashFunctions.hpp Virus.hpp Country.hpp VirusCountryEntry.hpp
+SOURCE	= main.cpp BloomFilter.cpp SkipList.cpp List.cpp HashTable.cpp Person.cpp Record.cpp Virus.cpp Country.cpp VirusCountryEntry.cpp
+OBJS	= main.o BloomFilter.o SkipList.o List.o HashTable.o Person.o Record.o Virus.o Country.o VirusCountryEntry.o
+SCRIPTS = testFile.sh
 LDLIBS	=
 TARGET	= vaccineMonitor
 
@@ -27,20 +29,23 @@ HashTable: HashTable.cpp
 Person: Person.cpp
 	$(CPP) $(FLAGS) Person.cpp
 
+Record: Record.cpp
+	$(CPP) $(FLAGS) Record.cpp
+
 Virus: Virus.cpp
 	$(CPP) $(FLAGS) Virus.cpp
 
 Country: Country.cpp
 	$(CPP) $(FLAGS) Country.cpp
 
-Record: Record.cpp
-	$(CPP) $(FLAGS) Record.cpp
+VirusCountryEntry: VirusCountryEntry.cpp
+	$(CPP) $(FLAGS) VirusCountryEntry.cpp
 
 clean:
 	rm -f *.o $(OBJS) $(TARGET)
 
 count:
-	wc -l -w $(SOURCE) $(HEADER)
+	wc -l -w $(SOURCE) $(HEADER) $(SCRIPTS)
 
 run:
 	./$(TARGET) -c citizenRecordsFile -b 1000
