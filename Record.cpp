@@ -14,7 +14,7 @@ Record &Record::operator=(const Record &record) {
 }
 
 bool operator==(const Record &r1, const Record &r2) {
-  return (r1.ID() == r2.ID() && r1.getDate() == r2.getDate());
+  return (r1.ID() == r2.ID());
 }
 
 bool operator!=(const Record &r1, const Record &r2) {
@@ -50,6 +50,10 @@ void Record::set(unsigned int id, Date date) {
 void Record::set(unsigned int id, std::string dateStr) {
   this->citizenID = id;
   this->date.set(dateStr);
+}
+
+bool Record::isIdentical(const Record &record) {
+  return (this->ID() == record.ID() && this->getDate() == record.getDate());
 }
 
 void Record::print() const {
