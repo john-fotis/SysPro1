@@ -13,12 +13,12 @@ private:
   unsigned int hashFunctionsNumber;
   char *bitArray;
 
-  // Create a mask and apply logical OR to set a bit in bitArray (Mask Type: 0-0-0-0-0-0-0-0-1)
+  // Apply logical OR to the array with a mask (Mask Type: 0-0-0-0-0-0-0-0-1)
   void set(unsigned int pos) { bitArray[pos/CHAR_SIZE] |= (1 << pos%CHAR_SIZE); }
-  // Create a mask and apply logical NAND to reset a bit in bitArray
+  // Apply logical AND to the array with a mask (Mask Type: 1-1-1-1-1-1-1-1-0)
   void reset(unsigned int pos) { bitArray[pos/CHAR_SIZE] &= ~(1 << pos%CHAR_SIZE); }
-  // Create a mask and apply logical AND to check the status of a bit in bitArray
-  bool checkBit(unsigned int pos) const { return ((bitArray[pos / CHAR_SIZE]) & (1 << pos % CHAR_SIZE)); }
+  // Check the result logical AND to the array with a mask (Mask Type: 0-0-0-0-0-0-0-0-1)
+  bool checkBit(unsigned int pos) const { return ((bitArray[pos/CHAR_SIZE]) & (1 << pos%CHAR_SIZE)); }
 
 public:
   // Input size of bitarray is expected in bytes, NOT bits
@@ -29,7 +29,6 @@ public:
   }
   ~BloomFilter() { delete[] bitArray; }
   BloomFilter(const BloomFilter &filter);
-
   BloomFilter &operator=(const BloomFilter &filter);
 
   unsigned int getSize() const { return size; }
@@ -37,6 +36,7 @@ public:
 
   void insert(const std::string &input);
   bool check(const std::string &input);
+  // Prints the bitArray
   void arrayStatus() const;
 };
 

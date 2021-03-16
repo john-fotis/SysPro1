@@ -6,6 +6,8 @@
 BloomFilter::BloomFilter(const BloomFilter &filter) {
   if (this == &filter) return;
   size = filter.getSize();
+  delete[] bitArray;
+  bitArray = new char[size/BITS_IN_BYTE]; // the size we copied was in bits!
   hashFunctionsNumber = filter.getFunctionsNumber();
   for (unsigned int pos = 0; pos < size; pos++)
     if (filter.checkBit(pos)) set(pos);
@@ -15,6 +17,8 @@ BloomFilter::BloomFilter(const BloomFilter &filter) {
 BloomFilter &BloomFilter::operator=(const BloomFilter &filter) {
   if (this == &filter) return *this;
   size = filter.getSize();
+  delete[] bitArray;
+  bitArray = new char[size/BITS_IN_BYTE]; // the size we copied was in bits!
   hashFunctionsNumber = filter.getFunctionsNumber();
   for (unsigned int pos = 0; pos < size; pos++)
     if (filter.checkBit(pos)) set(pos);
