@@ -11,9 +11,18 @@
     "ostream": "cpp",
     "utility": "cpp",
     "string_view": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "fstream": "cpp",
+    "functional": "cpp",
+    "istream": "cpp",
+    "sstream": "cpp",
+    "streambuf": "cpp",
+    "tuple": "cpp"
   },
   "cSpell.words": [
+    "COVID",
+    "HEPPATITIS",
+    "MENINGOCCAL",
     "arbitary",
     "lvls",
     "stoi"
