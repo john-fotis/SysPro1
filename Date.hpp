@@ -3,18 +3,23 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 
 #include "StringLibrary.hpp"
 
 #define DAYS_PER_MONTH 30
 #define MONTHS_IN_YEAR 12
 
+static std::time_t t = std::time(0); // Current time!
+static std::tm *tm = std::localtime(&t);
+
 class Date {
 private:
   int day, month, year;
 
 public:
-  Date(int d=0, int m=0, int y=0): day(d), month(m), year(y) {}
+  Date(int d=tm->tm_mday, int m=tm->tm_mon+1, int y=tm->tm_year+1900)
+  : day(d), month(m), year(y) {}
   // Gets a string formatted date and converts it to int
   Date(std::string date) { set(date); }
 
@@ -28,7 +33,11 @@ public:
     date.append(toString(year));
   }
 
-  void set(int d=0, int m=0, int y=0) { day = d; month = m; year = y; }
+  void set(int d=tm->tm_mday, int m=tm->tm_mon+1, int y=tm->tm_year+1900) {
+    day = d;
+    month = m;
+    year = y;
+  }
   void set(std::string date) {
     if (!date.compare("")) { day = month = year = 0; return; }
     bool validDate = true;
@@ -37,11 +46,9 @@ public:
     splitLine(date, args, '-');
     if (args.getSize() != 3) validDate = false;
     else {
-      d = args.getFirst();
-      args.popFirst();
-      m = args.getFirst();
-      args.popFirst();
-      y = args.getFirst();
+      d = *args.getNode(0);
+      m = *args.getNode(1);
+      y = *args.getNode(2);
     }
 
     for(int pos = 0; pos < d.length(); pos++)
