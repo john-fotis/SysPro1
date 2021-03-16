@@ -102,6 +102,16 @@ void SkipList<T>::print() const {
 }
 
 template <typename T>
+T *SkipList<T>::getNode(unsigned int pos) {
+  if (pos > size) return NULL;
+  skipNode *temp = head->nextAtLevel[0];
+  for (; pos > 0; pos--)
+    temp = temp->nextAtLevel[0];
+  T *ptr = &temp->data;
+  return ptr;
+}
+
+template <typename T>
 T *SkipList<T>::search(const T data) const {
   if (empty()) return NULL;
   skipNode *temp = head;

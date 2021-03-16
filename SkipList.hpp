@@ -2,6 +2,7 @@
 #define SKIPLIST_HPP
 
 #include <ctime>
+#include <cstdlib>
 
 #define DEFAULT_LEVELS 5
 #define PROBABILITY 0.25
@@ -83,6 +84,7 @@ public:
 
   bool empty() const { return (size == 0); }
   void print() const;
+  T *getNode(unsigned int pos);
   T *search(const T data) const;
 };
 
