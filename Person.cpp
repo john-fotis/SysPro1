@@ -23,34 +23,39 @@ Person &Person::operator=(const Person &person) {
   return *this;
 }
 
-bool operator==(const Person &r1, const Person &r2) {
-  return (
-    r1.ID() == r2.ID() &&
-    r1.getFirstName() == r2.getFirstName() &&
-    r1.getLastName() == r2.getLastName() &&
-    r1.getCountry() == r2.getCountry() &&
-    r1.getAge() == r2.getAge()
-  );
+void Person::set( unsigned int id, std::string name, std::string surname,
+                 Country *country, unsigned int age) {
+  this->id = id;
+  firstName.clear();
+  firstName = name;
+  lastName.clear();
+  lastName = surname;
+  this->country = country;
+  this->age = age;
 }
 
-bool operator!=(const Person &r1, const Person &r2) {
-  return !(r1 == r2);
+bool operator==(const Person &p1, const Person &p2) {
+  return (p1.ID() == p2.ID());
 }
 
-bool operator<(const Person &r1, const Person &r2) {
-  return r1.ID() < r2.ID();
+bool operator!=(const Person &p1, const Person &p2) {
+  return !(p1 == p2);
 }
 
-bool operator>(const Person &r1, const Person &r2) {
-  return r1.ID() > r2.ID();
+bool operator<(const Person &p1, const Person &p2) {
+  return p1.ID() < p2.ID();
 }
 
-bool operator<=(const Person &r1, const Person &r2) {
-  return r1.ID() <= r2.ID();
+bool operator>(const Person &p1, const Person &p2) {
+  return p1.ID() > p2.ID();
 }
 
-bool operator>=(const Person &r1, const Person &r2) {
-  return r1.ID() >= r2.ID();
+bool operator<=(const Person &p1, const Person &p2) {
+  return p1.ID() <= p2.ID();
+}
+
+bool operator>=(const Person &p1, const Person &p2) {
+  return p1.ID() >= p2.ID();
 }
 
 std::ostream &operator<<(std::ostream &os, const Person &person) {
@@ -62,15 +67,13 @@ std::ostream &operator<<(std::ostream &os, const Person &person) {
   return os;
 }
 
-void Person::set( unsigned int id, std::string name, std::string surname,
-                 Country *country, unsigned int age) {
-  this->id = id;
-  firstName.clear();
-  firstName = name;
-  lastName.clear();
-  lastName = surname;
-  this->country = country;
-  this->age = age;
+bool Person::isIdentical(const Person &person) {
+  return (
+      this->ID() == person.ID() &&
+      this->getFirstName() == person.getFirstName() &&
+      this->getLastName() == person.getLastName() &&
+      this->getCountry() == person.getCountry() &&
+      this->getAge() == person.getAge());
 }
 
 void Person::print() const {
