@@ -52,6 +52,7 @@ public:
   void flush() { while(!empty()) popFirst(); } // Empties the list
   
   void print() const;
+  T *getNode(unsigned int pos);
   T *search(const T data) const;
   bool contains(const T &data) const;
 };

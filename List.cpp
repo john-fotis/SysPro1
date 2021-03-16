@@ -5,6 +5,7 @@
 #include "Virus.hpp"
 #include "Country.hpp"
 #include "Record.hpp"
+#include "VirusCountryEntry.hpp"
 
 template <typename T>
 void List<T>::insertFirst(T data) {
@@ -168,6 +169,16 @@ void List<T>::print() const {
 }
 
 template <typename T>
+T *List<T>::getNode(unsigned int pos) {
+  if (pos > size) return NULL;
+  listNode *temp = head;
+  for (; pos > 0; pos--)
+    temp = temp->next;
+  T *ptr = &temp->data;
+  return ptr;
+}
+
+template <typename T>
 T *List<T>::search(const T data) const {
   if (empty()) return NULL;
   listNode *temp = this->head;
@@ -198,4 +209,5 @@ template class List<Person>;
 template class List<Virus>;
 template class List<Country>;
 template class List<Record>;
+template class List<VirusCountryEntry>;
 // ... and so on ...
