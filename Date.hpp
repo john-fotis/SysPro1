@@ -9,6 +9,7 @@
 
 #define DAYS_PER_MONTH 30
 #define MONTHS_IN_YEAR 12
+#define OLDEST_YEAR 1900
 
 static std::time_t t = std::time(0); // Current time!
 static std::tm *tm = std::localtime(&t);
@@ -74,8 +75,10 @@ public:
   inline friend std::ostream &operator<<(std::ostream &os, const Date &date);
 
   bool valid() const {
+    // Attention needed. Day 31 of a month is considered invalid for simplicity
     if (day < 1 || day > DAYS_PER_MONTH) return false;
     if (month < 1 || month > MONTHS_IN_YEAR) return false;
+    if (year < OLDEST_YEAR) return false;
     return true;
   }
   void print() const {std::cout << day << "-" << month << "-" << year << std::endl;}
