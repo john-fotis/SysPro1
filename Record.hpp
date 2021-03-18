@@ -33,7 +33,6 @@ public:
   friend bool operator>=(const Record &r1, const Record &r2);
   friend std::ostream &operator<<(std::ostream &os, const Record &record);
 
-  bool isIdentical(const Record &record);
   void print() const;
 };
 

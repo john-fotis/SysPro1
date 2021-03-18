@@ -52,10 +52,6 @@ void Record::set(unsigned int id, std::string dateStr) {
   this->date.set(dateStr);
 }
 
-bool Record::isIdentical(const Record &record) {
-  return (this->ID() == record.ID() && this->getDate() == record.getDate());
-}
-
 void Record::print() const {
   std::cout << citizenID << " " << date;
 }
