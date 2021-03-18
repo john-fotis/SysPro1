@@ -5,14 +5,14 @@
 duplicateRatio=50 # %
 vaccinateRatio=50 # %
 # We use a dictionary of first and last names
-firstNamesFile="firstNames"
-lastNamesFile="lastNames"
+firstNamesNumber=100
+lastNamesNumber=100
 outputFile="citizenRecordsFile"
 # Above 10000, we can't ensure unique IDs
 maxID=10000
 
 
-################### Get input
+################### Get input arguments
 
 for arg in "$@"; do
   index=$(echo $arg | cut -f1 -d=)
@@ -76,16 +76,20 @@ file="$countryList"
 while read line; do countryArray+=("$line"); done < $file
 printf "Country Records: %d\n" $((${#countryArray[@]}))
 
-# First names file
+# Generate 100 random firstnames to use as seed below
 declare -a firstNamesArray;
-file="$firstNamesFile"
-while read line; do firstNamesArray+=("$line"); done < $file
+for ((i=0; i<$firstNamesNumber; i++)) do
+  length=$(($RANDOM%9+3)) # Random length of 3-12 characters
+  firstNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
+done
 printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
 
-# Last names file
+# Generate 100 random lastNames to use as seed below
 declare -a lastNamesArray;
-file="$lastNamesFile"
-while read line; do lastNamesArray+=("$line"); done < $file
+for ((i=0; i<$lastNamesNumber; i++)) do
+  length=$(($RANDOM%9+3)) # Random length of 3-12 characters
+  lastNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
+done
 printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
 
 ################### Get the file records data - End
@@ -108,8 +112,10 @@ if [[ $duplicates -eq 0 ]]; then
 else
   # Generate the first original record in order to have something to duplicate
   id=$(($RANDOM%$maxID))
-  firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
-  lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
+  length=$(($RANDOM%9+3))
+  firstName=$(tr -dc A-Z </dev/urandom | head -c $length)
+  length=$(($RANDOM%9+3))
+  lastName=$(tr -dc A-Z </dev/urandom | head -c $length)
   country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
   age=$(($RANDOM%120+1))
 fi
@@ -137,7 +143,7 @@ for ((counter=0; counter<$lines; counter++)) do
     age=$(($RANDOM%120+1))
   else
   ### Case: Cause duplicate IDs on purpose based on defined possibility
-    if [[ "$((RANDOM%100))" -gt $duplicateRatio ]]; then
+    if [[ "$((RANDOM%100))" -gt $duplicateRatio || $counter -lt 1 ]]; then
     ### Case: Generate an original record
       # All variables here are initialized randomly
       id=$(($RANDOM%$maxID))
