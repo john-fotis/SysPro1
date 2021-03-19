@@ -4,14 +4,12 @@ Country::Country(const Country &country) {
   if (this == &country) return;
   name.clear();
   name.assign(country.getName());
-  population = country.getPopulation();
 }
 
 Country &Country::operator=(const Country &country) {
   if (this == &country) return *this;
   name.clear();
   name.assign(country.getName());
-  population = country.getPopulation();
   return *this;
 }
 
