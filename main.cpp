@@ -44,6 +44,7 @@ struct recordObject {
   Country country;
   Record record;
   VirusCountryEntry vCountryEntry;
+  Date date1, date2;  
   // Constructor to set up the desired bloom size for every virus bloom filter
   // Note that we will NOT insert any citizen in this virus filter!!
   recordObject(unsigned int bloomSize) : virus(bloomSize) {}
@@ -119,7 +120,15 @@ static bool testRecord(string &line, recordInfo &recInfo, recordObject &obj, app
   recInfo.virusName.assign(*args.getNode(5));
   recInfo.status.assign(*args.getNode(6));
 
-  // A negative age is not invalid
+  // A negative ID is not valid
+  if (myStoi(recInfo.idStr) < 0) return false;
+  // Check for non alpha characters in firstName
+  if (containsNonAlpha(recInfo.firstName)) return false;
+  // Check for non alpha characters in lastName
+  if (containsNonAlpha(recInfo.lastName)) return false;
+  // Check for non alpha characters in countryName
+  if (containsNonAlpha(recInfo.countryName)) return false;
+  // A negative age is not valid
   if (myStoi(recInfo.ageStr) < 0) return false;
   // The status will either be YES or NO
   if (recInfo.status.compare("YES") && recInfo.status.compare("NO")) return false;
@@ -144,9 +153,9 @@ static bool testRecord(string &line, recordInfo &recInfo, recordObject &obj, app
     // If that's NOT the first record from this country, check out this person's info
     obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
       recInfo.lastName, countryPtr, myStoi(recInfo.ageStr));
-    Person *ptr = db.citizenRegistry.search(recInfo.idStr, obj.person);
-    if (ptr) // If this ID is already in the registry, validate all the rest person's info
-      if (!ptr->isIdentical(obj.person)) return false;
+    Person *personPtr = db.citizenRegistry.search(recInfo.idStr, obj.person);
+    if (personPtr) // If this ID is already in the registry, validate all the rest person's info
+      if (!personPtr->isIdentical(obj.person)) return false;
   }
 
   // If we made it till here, the record is valid...
@@ -209,16 +218,12 @@ bool insertNewrecord(recordInfo &recInfo, recordObject &obj, appDataBase &db) {
     countryPtr = db.countryList.search(obj.country);
   }
 
-  // Dont insert the person information in country population
-  // or the hashtable registry if he was already inserted once
   // Set up the person object
   obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
     recInfo.lastName, countryPtr, myStoi(recInfo.ageStr));
   Person *personPtr = db.citizenRegistry.search(recInfo.idStr, obj.person);
-  if (!personPtr) {
-    db.citizenRegistry.insert(recInfo.idStr, obj.person);
-    countryPtr->addPerson();
-  }
+  // Insert the person information in the registry only if he isn't already in
+  if (!personPtr) db.citizenRegistry.insert(recInfo.idStr, obj.person);
 
   // Insert the new virus-country entry if its NOT already stored
   VirusCountryEntry * entryPtr;
@@ -245,51 +250,56 @@ bool insertNewrecord(recordInfo &recInfo, recordObject &obj, appDataBase &db) {
 // Print format for popStatusByAge without dates
 void printAllStatisticsByAge(VirusCountryEntry *entryPtr) {
   if (!entryPtr) return;
+
+  float result1, result2, result3, result4;
+  entryPtr->getTotal_0_20() != 0 ?
+  result1=(100*(float)entryPtr->vac_0_20()/entryPtr->getTotal_0_20()) : result1=0;
+  entryPtr->getTotal_20_40() != 0 ?
+  result2=(100*(float)entryPtr->vac_20_40()/entryPtr->getTotal_20_40()) : result2=0;
+  entryPtr->getTotal_40_60() != 0 ?
+  result3=(100*(float)entryPtr->vac_40_60()/entryPtr->getTotal_40_60()) : result3=0;
+  entryPtr->getTotal_60_plus() != 0 ?
+  result4=(100*(float)entryPtr->vac_60_plus()/entryPtr->getTotal_60_plus()) : result4=0;
+
   std::cout << std::endl << entryPtr->getCountry().getName()
   << " " << entryPtr->getVirus().getName() << std::endl
-
-  << std::setw(7) << "0-20: " << std::setw(5)
-  << entryPtr->vac_0_20() << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)entryPtr->vac_0_20()/entryPtr->getTotal_0_20()) << "%\n"
-
-  << std::setw(7) << "20-40: " << std::setw(5)
-  << entryPtr->vac_20_40() << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)entryPtr->vac_20_40()/entryPtr->getTotal_20_40()) << "%\n"
-
-  << std::setw(7) << "40-60: " << std::setw(5)
-  << entryPtr->vac_40_60() << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)entryPtr->vac_40_60()/entryPtr->getTotal_40_60()) << "%\n"
-
-  << std::setw(7) << "60+: " << std::setw(5)
-  << entryPtr->vac_60_plus() << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)entryPtr->vac_60_plus()/entryPtr->getTotal_60_plus()) << "%\n";
+  << std::setw(7) << "0-20: " << std::setw(5) << entryPtr->vac_0_20()
+  << "  " << std::fixed << std::setprecision(2) << result1 << "%\n"
+  << std::setw(7) << "20-40: " << std::setw(5) << entryPtr->vac_20_40()
+  << "  " << std::fixed << std::setprecision(2) << result2 << "%\n"
+  << std::setw(7) << "40-60: " << std::setw(5) << entryPtr->vac_40_60()
+  << "  " << std::fixed << std::setprecision(2) << result3 << "%\n"
+  << std::setw(7) << "60+: " << std::setw(5) << entryPtr->vac_60_plus()
+  << "  " << std::fixed << std::setprecision(2) << result4 << "%\n";
 }
 
 // Print format for popStatusByAge with dates
 void printByAgeWithDates(VirusCountryEntry *entryPtr,
   unsigned int age_0_20, unsigned int age_20_40, unsigned int age_40_60,
   unsigned int age_60_plus, Date date1, Date date2) {
-
   if (!entryPtr) return;
+
+  float result1, result2, result3, result4;
+  entryPtr->getTotal_0_20() != 0 ?
+  result1=(100*(float)age_0_20/entryPtr->getTotal_0_20()) : result1=0;
+  entryPtr->getTotal_20_40() != 0 ?
+  result2=(100*(float)age_20_40/entryPtr->getTotal_20_40()) : result2=0;
+  entryPtr->getTotal_40_60() != 0 ?
+  result3=(100*(float)age_40_60/entryPtr->getTotal_40_60()) : result3=0;
+  entryPtr->getTotal_60_plus() != 0 ?
+  result4=(100*(float)age_60_plus/entryPtr->getTotal_60_plus()) : result4=0;
+
   std::cout << std::endl << entryPtr->getCountry().getName()
   << " " << entryPtr->getVirus().getName() << " BETWEEN "
   << date1 << " AND " << date2 << std::endl
-
-  << std::setw(7) << "0-20: " << std::setw(5)
-  << age_0_20 << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)age_0_20/entryPtr->getTotal_0_20()) << "%\n"
-
-  << std::setw(7) << "20-40: " << std::setw(5)
-  << age_20_40 << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)age_20_40/entryPtr->getTotal_20_40()) << "%\n"
-
-  << std::setw(7) << "40-60: " << std::setw(5)
-  << age_40_60 << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)age_40_60/entryPtr->getTotal_40_60()) << "%\n"
-
-  << std::setw(7) << "60+: " << std::setw(5)
-  << age_60_plus << "  " << std::fixed << std::setprecision(2)
-  << (100*(float)age_60_plus/entryPtr->getTotal_60_plus()) << "%\n";
+  << std::setw(7) << "0-20: " << std::setw(5) << age_0_20
+  << "  " << std::fixed << std::setprecision(2) << result1 << "%\n"
+  << std::setw(7) << "20-40: " << std::setw(5) << age_20_40
+  << "  " << std::fixed << std::setprecision(2) << result2 << "%\n"
+  << std::setw(7) << "40-60: " << std::setw(5) << age_40_60
+  << "  " << std::fixed << std::setprecision(2) << result3 << "%\n"
+  << std::setw(7) << "60+: " << std::setw(5) << age_60_plus
+  << "  " << std::fixed << std::setprecision(2) << result4 << "%\n";
 }
 
 int main (int argc, char *argv[]) {
@@ -360,17 +370,23 @@ int main (int argc, char *argv[]) {
   // Contains all the data structrures that implement the app's database for the queries
   appDataBase db(CITIZEN_REGISTRY_SIZE, VIRUS_COUNTRY_ENTRIES);
   bool recordOk = false, inserted = true;
+  unsigned inconsistentRecs = 0, duplicateRecs = 0, totalRecords = 0;
   // ========== Variables ==========
 
   /* Validate & import the input records into the application structure */
   while (std::getline(inputFile, line)) {
+    totalRecords++;
     // Split the current line in variables and do basic validation
     recordOk = testRecord(line, recInfo, obj, db);
     if (recordOk) {
       // Then insert the valid info into the appropriate structures of the app
       inserted = insertNewrecord(recInfo, obj,  db);
-      if (!inserted) std::cerr << "DUPLICATE RECORD: " << line << std::endl;
+      if (!inserted) {
+        std::cerr << "DUPLICATE RECORD: " << line << std::endl;
+        duplicateRecs++;
+      }
     } else {
+      inconsistentRecs++;
       std::cerr << "ERROR IN RECORD: " << line << std::endl;
       // Dump this record
       continue;
@@ -379,12 +395,16 @@ int main (int argc, char *argv[]) {
   /* Validate & import the input records into the application structure */
 
   inputFile.close();
-  std::cout << "\nDone reading '" << argv[2] << "'\n";
+  std::cout << "\nDone reading '" << argv[2] << "'\n"
+  << "Excluded " << inconsistentRecs+duplicateRecs
+  << "/" << totalRecords << " records.\n"
+  << "Inconsistent records: " << std::setw(1) << inconsistentRecs << std::endl
+  << "Duplicate records:" << std::setw(8) << duplicateRecs << std::endl;
+
 
   // Current time!
   std::time_t t = std::time(0);
   std::tm *time = std::localtime(&t);
-  Date date1, date2;
 
   // Pointers to handle all the structures and objects
   Virus *virusPtr;
@@ -492,11 +512,13 @@ int main (int argc, char *argv[]) {
                   virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
                 );
                 // Print the results for the country
-                std::cout << std::setw(10) << countryPtr->getName() << " "
-                  << std::setw(5) << entryPtr->getTotalVaccinated() << " "
-                  << std::fixed << std::setprecision(2)
+                std::cout << std::setw(11) << countryPtr->getName() << " "
+                  << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
+                if (entryPtr->getTotalRegistered() != 0)
+                  std::cout << std::fixed << std::setprecision(2)
                   << (100*(float)entryPtr->getTotalVaccinated()\
                   /entryPtr->getTotalRegistered()) << "%\n";
+                else std::cout << "0.00%\n";
               }
             } else std::cerr << "\nNO SUCH VIRUS FOUND\n";
             break;
@@ -518,10 +540,12 @@ int main (int argc, char *argv[]) {
               );
               // Print the results for the country
               std::cout << countryPtr->getName() << " "
-                << std::setw(5) << entryPtr->getTotalVaccinated() << " "
-                << std::fixed << std::setprecision(2)
+                << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
+              if (entryPtr->getTotalRegistered() != 0)
+                std::cout << std::fixed << std::setprecision(2)
                 << (100*(float)entryPtr->getTotalVaccinated()\
                 /entryPtr->getTotalRegistered()) << "%\n";
+              else std::cout << "0.00%\n";
             }
             else if (!countryPtr && !virusPtr) std::cerr << "\nINVALID COUNTRY AND VIRUS NAME\n"; 
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
@@ -531,11 +555,11 @@ int main (int argc, char *argv[]) {
           case 3: // Case: /populationStatus virusName date1 date 2
 
             obj.virus.setName(*args.getNode(0));
-            date1.set(*args.getNode(1));
-            date2.set(*args.getNode(2));
+            obj.date1.set(*args.getNode(1));
+            obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && date1.valid() && date2.valid() && (date1 < date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -552,7 +576,7 @@ int main (int argc, char *argv[]) {
                 for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                   recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                   // Validate the record's dates
-                  if (recordPtr->getDate()>=date1 && recordPtr->getDate()<=date2) {
+                  if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
                     // Validate this belongs to the country we're looking for
                     recInfo.idStr.assign(toString(recordPtr->ID()));
                     obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
@@ -565,10 +589,12 @@ int main (int argc, char *argv[]) {
                   }
                 }
                 // Print the results for the country
-                std::cout << countryPtr->getName() << " "
-                  << std::setw(5) << totalVaccinated << " "
+                std::cout << countryPtr->getName() << " ";
+                if (entryPtr->getTotalRegistered() != 0)
+                  std::cout << std::setw(5) << totalVaccinated << " "
                   << std::fixed << std::setprecision(2)
                   << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+                else std::cout << "0.00%\n";
               }
             }
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
@@ -579,15 +605,15 @@ int main (int argc, char *argv[]) {
 
             obj.country.setName(*args.getNode(0));
             obj.virus.setName(*args.getNode(1));
-            date1.set(*args.getNode(2));
-            date2.set(*args.getNode(3));
+            obj.date1.set(*args.getNode(2));
+            obj.date2.set(*args.getNode(3));
             // Locate the virus and country in the database
             countryPtr = db.countryList.search(obj.country);
             virusPtr = db.virusList.search(obj.virus);
             // Reset the vaccinated citizens counter for this country
             totalVaccinated = 0;
 
-            if (virusPtr && countryPtr && date1.valid() && date2.valid() && (date1 < date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
@@ -599,7 +625,7 @@ int main (int argc, char *argv[]) {
               for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                 recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                 // Validate the record's dates
-                if (recordPtr->getDate()>=date1 && recordPtr->getDate()<=date2) {
+                if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
                   // Validate this belongs to the country we're looking for
                   recInfo.idStr.assign(toString(recordPtr->ID()));
                   obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
@@ -612,11 +638,14 @@ int main (int argc, char *argv[]) {
                 }
               }
               // Print the results for the country
-              std::cout << countryPtr->getName() << " "
-                << std::setw(5) << totalVaccinated << " "
-                << std::fixed << std::setprecision(2)
-                << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+              std::cout << countryPtr->getName() << " ";
+              if (entryPtr->getTotalRegistered() != 0)
+                  std::cout << std::setw(5) << totalVaccinated << " "
+                  << std::fixed << std::setprecision(2)
+                  << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+              else std::cout << "0.00%\n";
             }
+            else if(!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
             else std::cerr << "\nINVALID DATES GIVEN\n";
@@ -676,11 +705,11 @@ int main (int argc, char *argv[]) {
           case 3: // Case: /popStatusByAge virusName date1 date 2
 
             obj.virus.setName(*args.getNode(0));
-            date1.set(*args.getNode(1));
-            date2.set(*args.getNode(2));
+            obj.date1.set(*args.getNode(1));
+            obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && date1.valid() && date2.valid() && (date1 < date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -697,7 +726,7 @@ int main (int argc, char *argv[]) {
                 for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                   recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                   // Validate the record's dates
-                  if (recordPtr->getDate()>=date1 && recordPtr->getDate()<=date2) {
+                  if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
                     // Validate this belongs to the country we're looking for
                     recInfo.idStr.assign(toString(recordPtr->ID()));
                     obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
@@ -715,8 +744,8 @@ int main (int argc, char *argv[]) {
                   }
                 }
                 // Print out the results
-                printByAgeWithDates(entryPtr, age_0_20,
-                  age_20_40, age_40_60, age_60_plus, date1, date2);
+                printByAgeWithDates(entryPtr, age_0_20, age_20_40,
+                  age_40_60, age_60_plus, obj.date1, obj.date2);
               }
             }
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
@@ -727,13 +756,13 @@ int main (int argc, char *argv[]) {
 
             obj.country.setName(*args.getNode(0));
             obj.virus.setName(*args.getNode(1));
-            date1.set(*args.getNode(2));
-            date2.set(*args.getNode(3));
+            obj.date1.set(*args.getNode(2));
+            obj.date2.set(*args.getNode(3));
             // Locate the virus and country in the database
             countryPtr = db.countryList.search(obj.country);
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && countryPtr && date1.valid() && date2.valid() && (date1 < date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
@@ -747,7 +776,7 @@ int main (int argc, char *argv[]) {
               for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                 recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                 // Validate the record's dates
-                if (recordPtr->getDate()>=date1 && recordPtr->getDate()<=date2) {
+                if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
                   // Validate this belongs to the country we're looking for
                   recInfo.idStr.assign(toString(recordPtr->ID()));
                   obj.person.set(myStoi(recInfo.idStr), recInfo.firstName,
@@ -765,9 +794,10 @@ int main (int argc, char *argv[]) {
                 }
               }
               // Print out the results
-              printByAgeWithDates(entryPtr, age_0_20,
-                age_20_40, age_40_60, age_60_plus, date1, date2);
+              printByAgeWithDates(entryPtr, age_0_20, age_20_40,
+                age_40_60, age_60_plus, obj.date1, obj.date2);
             }
+            else if(!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
             else std::cerr << "\nINVALID DATES GIVEN\n";
@@ -784,8 +814,8 @@ int main (int argc, char *argv[]) {
         // If the record has vaccination status YES and the date is missing
         if (!args.getNode(6)->compare("YES") && args.getSize()==7) {
           // Set up today's date
-          date1.set();
-          date1.get(recInfo.dateVaccinated);
+          obj.date1.set();
+          obj.date1.get(recInfo.dateVaccinated);
           // And push it as the last argument in the arguments list
           args.insertLast(recInfo.dateVaccinated);
         }
@@ -830,7 +860,7 @@ int main (int argc, char *argv[]) {
               }
             }
           }
-        } else std::cerr << "\nINVALID RECORD: " << line << std::endl;
+        } else std::cerr << "\nINVALID OR DUPLICATE RECORD: " << line << std::endl;
         break;
 
       case 6: // Vaccinate now
