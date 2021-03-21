@@ -18,6 +18,14 @@ inline unsigned int myStoi(std::string str) {
   return result;
 }
 
+inline bool containsNonAlpha(std::string str) {
+  for (int i = 0; i < str.length(); i++)
+    if (((int)(str[i]) < 'a' || (int)(str[i]) > 'z') &&
+        ((int)(str[i]) < 'A' || (int)(str[i]) > 'Z'))
+      return true;
+  return false;
+}
+
 // Reads a line until character '\0' and splits it
 // into arguments which are pushed into the argument list.
 // The splitting procedure cuts off whitespace characters and the deliminator
