@@ -12,6 +12,22 @@ outputFile="citizenRecordsFile"
 maxID=10000
 
 
+################### Function to write records to the output file
+
+insertRecord () {  # ID firstName lastName country age virusName status
+  # Check if we need to add a date
+  if [[ "$7" == "YES" ]]; then
+    dd=$(($RANDOM%30+1)); mm=$(($RANDOM%12+1)); yyyy=$(($RANDOM%21+2000+1))
+    date="$dd-$mm-$yyyy"
+    # Append the record to the output file
+    echo $1 $2 $3 $4 $5 $6 $7 $date >> $outputFile
+  else
+    # Append the record to the output file without date
+    echo $1 $2 $3 $4 $5 $6 $7 >> $outputFile
+  fi
+}
+
+
 ################### Get input arguments
 
 for arg in "$@"; do
@@ -46,11 +62,6 @@ if [ $lines -lt 1 ]; then
   inputOk=false
 fi
 
-if [[ ($lines -gt 10000 && $duplicates -eq 0) ]]; then
-  echo "Can't produce more than 10K unique IDs with the restriction of 4-digits"
-  inputOk=false
-fi
-
 echo "Input was: $1, $2, $3, $4"
 
 if [[ $inputOk == false ]]; then
@@ -62,7 +73,7 @@ fi
 
 start=$(date +%s.%N) # Start clock
 
-################### Get the file records data - Start
+################### Records' data seed arrays - Start
 
 # Viruses file
 declare -a virusArray;
@@ -92,57 +103,75 @@ for ((i=0; i<$lastNamesNumber; i++)) do
 done
 printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
 
-################### Get the file records data - End
+################### Records' data seed arrays - End
 
 
-################### Declare and initialize variables - Start
+################### Main Program
 
 # Check if output file already exists and if so, delete it
 [[ -f "$outputFile" ]] && rm -f $outputFile
 touch $outputFile
 
 # Array of unused IDs
-declare -a unusedIdArray;
-# Array that keeps |ID-firstName-lastName-country-age| of all original records
+declare -a unusedIdsArray;
 availableIdAmount=$maxID
 
-if [[ $duplicates -eq 0 ]]; then
-  # Fill up with all possible unused IDs (0-9999)
-  for ((i=0; i<$maxID; i++)) do unusedIdArray+=($i); done
-else
-  # Generate the first original record in order to have something to duplicate
-  id=$(($RANDOM%$maxID))
-  length=$(($RANDOM%9+3))
-  firstName=$(tr -dc A-Z </dev/urandom | head -c $length)
-  length=$(($RANDOM%9+3))
-  lastName=$(tr -dc A-Z </dev/urandom | head -c $length)
-  country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
-  age=$(($RANDOM%120+1))
-fi
+if [[ $duplicates -eq 0 ]]; then ### Case: Avoid duplicate IDs
 
-################### Declare and initialize variables - End
+  # Fill up the unused ID array with all possible unused IDs (0-9999)
+  for ((i=0; i<$maxID; i++)) do unusedIdsArray+=($i); done
 
+  # Figure out if requested lines are more than the unique IDs
+  [[ $lines -gt $maxID ]] && loops=$maxID || loops=$lines
 
-################### Main Loop
-
-for ((counter=0; counter<$lines; counter++)) do
-
-  if [[ $duplicates -eq 0 ]]; then
-  ### Case: Avoid duplicate IDs
-    # Find a random index in the remaining IDs array and claim its value
+  for ((counter=0; counter<$loops; counter++)) do
+    # Find a random index in the unused IDs array and claim its value
     index=$(($RANDOM%$availableIdAmount))
-    id=${unusedIdArray[$index]}
+    id=${unusedIdsArray[$index]}
     # After claiming this ID, we can swap it with the last one in the array
     # and reduce the size of the array virtually by 1
-    unusedIdArray[$index]=${unusedIdArray[$availableIdAmount-1]}
+    unusedIdsArray[$index]=${unusedIdsArray[$availableIdAmount-1]}
     let "availableIdAmount--"
     # Generate the rest info
     firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
     lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
     country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
-    age=$(($RANDOM%120+1))
-  else
-  ### Case: Cause duplicate IDs on purpose based on defined possibility
+    age=$(($RANDOM%120+1))    
+    # The virus, vaccination status and date are irrelevant with the above
+    # computations and are initialized here, independently and randomly.
+    virusName=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
+    # Decide for a vaccination certificate based on the defined possibility
+    [[ $(($RANDOM%100)) < $vaccinateRatio ]] && status="YES" || status="NO"
+
+    insertRecord $id $firstName $lastName $country $age $virusName $status
+  done
+
+  # If we have to produce more records than the unique IDs
+  # we will fill up the rest with duplicates of the first 10K records
+  [[ $loops -eq $lines ]] && remainingLoops=0 || remainingLoops=$(($lines-$maxID))
+  for ((counter=0; counter<$remainingLoops; counter++)) do
+    # We read a line from the output file that we have already written at least one record
+    line=$(shuf -n 1 $outputFile)
+    # We split this line's arguments in order to copy them
+    arguments=(${line// / })
+    # And initialize the appropriate variables
+    id=$((${arguments}))
+    firstName=${arguments[1]}
+    lastName=${arguments[2]}
+    country=${arguments[3]}
+    age=${arguments[4]}
+    # The virus, vaccination status and date are irrelevant with the above
+    # computations and are initialized here, independently and randomly.
+    virusName=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
+    # Decide for a vaccination certificate based on the defined possibility
+    [[ $(($RANDOM%100)) < $vaccinateRatio ]] && status="YES" || status="NO"
+
+    insertRecord $id $firstName $lastName $country $age $virusName $status
+  done
+
+else ### Case: Cause duplicate IDs on purpose based on defined possibility
+
+  for ((counter=0; counter<$lines; counter++)) do
     if [[ "$((RANDOM%100))" -gt $duplicateRatio || $counter -lt 1 ]]; then
     ### Case: Generate an original record
       # All variables here are initialized randomly
@@ -164,26 +193,16 @@ for ((counter=0; counter<$lines; counter++)) do
       country=${arguments[3]}
       age=${arguments[4]}
     fi
-  fi
+    # The virus, vaccination status and date are irrelevant with the above
+    # computations and are initialized here, independently and randomly.
+    virusName=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
+    # Decide for a vaccination certificate based on the defined possibility
+    [[ $(($RANDOM%100)) < $vaccinateRatio ]] && status="YES" || status="NO"
 
-  # The virus, vaccination status and date are irrelevant with the above
-  # computations and are initialized here, independently and randomly.
-  virus=${virusArray[(($RANDOM % ${#virusArray[@]}))]}
-  # Decide for a vaccination certificate based on the defined possibility
-  [[ $(($RANDOM%100)) < $vaccinateRatio ]] && status="YES" || status="NO"
+    insertRecord $id $firstName $lastName $country $age $virusName $status
+  done
 
-  # Check if we need to add a date
-  if [ "$status" = "YES" ]; then
-    dd=$(($RANDOM%30+1)); mm=$(($RANDOM%12+1)); yyyy=$(($RANDOM%22+2000))
-    date="$dd-$mm-$yyyy"
-    # Append the record to the output file
-    echo $id $firstName $lastName $country $age $virus $status $date >> $outputFile
-  else
-    # Append the record to the output file without date
-    echo $id $firstName $lastName $country $age $virus $status >> $outputFile
-  fi
-
-done
+fi
 
 end=$(date +%s.%N) # Stop clock
 runningTime=$(echo "$end - $start" | bc)
