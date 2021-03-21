@@ -51,7 +51,7 @@ run:
 	./$(TARGET) -c citizenRecordsFile -b 1000
 
 valgrind:
-	valgrind -s --leak-check=full --track-origins=yes ./$(TARGET) -c citizenRecordsFile -b 1000
+	valgrind --show-leak-kinds=all --leak-check=full --show-reachable=yes --track-origins=yes ./$(TARGET) -c citizenRecordsFile -b 1000
 
 help:
 	@echo Options:
