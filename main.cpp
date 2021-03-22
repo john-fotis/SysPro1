@@ -525,12 +525,12 @@ int main (int argc, char *argv[]) {
 
           case 2: // Case: /populationStatus country virusName
 
-            obj.virus.setName(*args.getNode(1));
             obj.country.setName(*args.getNode(0));
+            obj.virus.setName(*args.getNode(1));
             // Find the right virus-country entry in the hashtable
             // in order to retrieve the statistics
-            virusPtr = db.virusList.search(obj.virus);
             countryPtr = db.countryList.search(obj.country);
+            virusPtr = db.virusList.search(obj.virus);
 
             if (countryPtr && virusPtr) {
               // Set up the correct entry parameters
@@ -645,7 +645,7 @@ int main (int argc, char *argv[]) {
                   << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
               else std::cout << "0.00%\n";
             }
-            else if(!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
+            else if (!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
             else std::cerr << "\nINVALID DATES GIVEN\n";
@@ -810,6 +810,11 @@ int main (int argc, char *argv[]) {
         break; // popStatusByAge - END
 
       case 5: // Insert citizen record
+
+        if (args.getSize() != 7 && args.getSize() != 8) {
+          std::cerr << ARGUMENTS_NUMBER << std::endl;
+          break;
+        }
 
         // If the record has vaccination status YES and the date is missing
         if (!args.getNode(6)->compare("YES") && args.getSize()==7) {
