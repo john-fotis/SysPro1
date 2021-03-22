@@ -559,7 +559,7 @@ int main (int argc, char *argv[]) {
             obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -613,7 +613,7 @@ int main (int argc, char *argv[]) {
             // Reset the vaccinated citizens counter for this country
             totalVaccinated = 0;
 
-            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
@@ -709,7 +709,7 @@ int main (int argc, char *argv[]) {
             obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -762,7 +762,7 @@ int main (int argc, char *argv[]) {
             countryPtr = db.countryList.search(obj.country);
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 < obj.date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
