@@ -456,7 +456,7 @@ int main (int argc, char *argv[]) {
         obj.virus.setName(recInfo.virusName);
         virusPtr = db.virusList.search(obj.virus);
         if (virusPtr) {
-          virusPtr->checkBloom(recInfo.idStr)? std::cout << "\nMAYBE\n": std::cout << "\nNO\n";
+          virusPtr->checkBloom(recInfo.idStr)? std::cout << "\nMAYBE\n" : std::cout << "\nNO\n";
           break;
         } else std::cerr << "\nNO SUCH VIRUS FOUND" << std::endl;
         break;
@@ -472,8 +472,8 @@ int main (int argc, char *argv[]) {
           if (virusPtr) {
             obj.record.setID(myStoi(recInfo.idStr));
             recordPtr = virusPtr->searchVaccinatedList(obj.record);
-            recordPtr? std::cout << "\nVACCINATED ON " << recordPtr->getDate() << std::endl
-            : std::cout << "\nNOT VACCINATED\n";
+            recordPtr? std::cout << "\nVACCINATED ON "
+            << recordPtr->getDate() << std::endl : std::cout << "\nNOT VACCINATED\n";
           } else std::cerr << "\nNO SUCH VIRUS FOUND\n" << std::endl;
         }
         else if (args.getSize() == 1) { // Case: /vaccineStatus citizenID
@@ -509,7 +509,7 @@ int main (int argc, char *argv[]) {
                 // Set up the correct entry parameters
                 obj.vCountryEntry.set(virusPtr, countryPtr);
                 entryPtr = db.entriesTable.search(
-                  virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                  virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
                 );
                 // Print the results for the country
                 std::cout << std::setw(11) << countryPtr->getName() << " "
@@ -536,7 +536,7 @@ int main (int argc, char *argv[]) {
               // Set up the correct entry parameters
               obj.vCountryEntry.set(virusPtr, countryPtr);
               entryPtr = db.entriesTable.search(
-                virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
               );
               // Print the results for the country
               std::cout << countryPtr->getName() << " "
@@ -559,7 +559,7 @@ int main (int argc, char *argv[]) {
             obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -613,7 +613,7 @@ int main (int argc, char *argv[]) {
             // Reset the vaccinated citizens counter for this country
             totalVaccinated = 0;
 
-            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
@@ -640,9 +640,9 @@ int main (int argc, char *argv[]) {
               // Print the results for the country
               std::cout << countryPtr->getName() << " ";
               if (entryPtr->getTotalRegistered() != 0)
-                  std::cout << std::setw(5) << totalVaccinated << " "
-                  << std::fixed << std::setprecision(2)
-                  << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+                std::cout << std::setw(5) << totalVaccinated << " "
+                << std::fixed << std::setprecision(2)
+                << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
               else std::cout << "0.00%\n";
             }
             else if (!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
@@ -674,7 +674,7 @@ int main (int argc, char *argv[]) {
                 // Set up the correct entry parameters
                 obj.vCountryEntry.set(virusPtr, countryPtr);
                 entryPtr = db.entriesTable.search(
-                  virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                  virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
                 );
                 printAllStatisticsByAge(entryPtr);
               }
@@ -693,7 +693,7 @@ int main (int argc, char *argv[]) {
               // Set up the correct entry parameters
               obj.vCountryEntry.set(virusPtr, countryPtr);
               entryPtr = db.entriesTable.search(
-                virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
               );
               printAllStatisticsByAge(entryPtr);
             }
@@ -709,7 +709,7 @@ int main (int argc, char *argv[]) {
             obj.date2.set(*args.getNode(2));
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
+            if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // Loop through all the known Countries
               for (int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
@@ -717,7 +717,7 @@ int main (int argc, char *argv[]) {
                 // to get the total vaccinated persons per age-category
                 obj.vCountryEntry.set(virusPtr, countryPtr);
                 entryPtr = db.entriesTable.search(
-                  virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                  virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
                 );
                 // Reset the vaccinated citizens counters for this country
                 age_0_20 = age_20_40 = age_40_60 = age_60_plus = 0;
@@ -762,12 +762,12 @@ int main (int argc, char *argv[]) {
             countryPtr = db.countryList.search(obj.country);
             virusPtr = db.virusList.search(obj.virus);
 
-            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1 <= obj.date2)) {
+            if (virusPtr && countryPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // We locate the corresponting virus-country entry in order
               // to get the total vaccinated persons per age-category
               obj.vCountryEntry.set(virusPtr, countryPtr);
               entryPtr = db.entriesTable.search(
-                virusPtr->getName()+countryPtr->getName(), obj.vCountryEntry
+                virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
               );
               // Reset the vaccinated citizens counters for this country
               age_0_20 = age_20_40 = age_40_60 = age_60_plus = 0;
@@ -797,7 +797,7 @@ int main (int argc, char *argv[]) {
               printByAgeWithDates(entryPtr, age_0_20, age_20_40,
                 age_40_60, age_60_plus, obj.date1, obj.date2);
             }
-            else if(!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
+            else if (!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
             else std::cerr << "\nINVALID DATES GIVEN\n";
@@ -860,8 +860,8 @@ int main (int argc, char *argv[]) {
                 inserted = insertNewrecord(recInfo, obj, db);
                 if (inserted)
                   std::cout << "\nSUCCESSFULLY INSERTED RECORD: " << line
-                    << "\nPREVIOUS RECORD: " << obj.person << " "
-                    << recInfo.virusName << " NO WAS DELETED\n";
+                  << "\nPREVIOUS RECORD: " << obj.person << " "
+                  << recInfo.virusName << " NO WAS DELETED\n";
               }
             }
           }
