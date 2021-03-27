@@ -90,7 +90,7 @@ printf "Country Records: %d\n" $((${#countryArray[@]}))
 # Generate 100 random firstnames to use as seed below
 declare -a firstNamesArray;
 for ((i=0; i<$firstNamesNumber; i++)) do
-  length=$(($RANDOM%9+3)) # Random length of 3-12 characters
+  length=$(($RANDOM%10+3)) # Random length of 3-12 characters
   firstNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
 done
 printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
@@ -98,7 +98,7 @@ printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
 # Generate 100 random lastNames to use as seed below
 declare -a lastNamesArray;
 for ((i=0; i<$lastNamesNumber; i++)) do
-  length=$(($RANDOM%9+3)) # Random length of 3-12 characters
+  length=$(($RANDOM%10+3)) # Random length of 3-12 characters
   lastNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
 done
 printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
