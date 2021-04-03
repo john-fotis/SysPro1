@@ -398,7 +398,7 @@ int main (int argc, char *argv[]) {
   std::cout << "\nDone reading '" << argv[2] << "'\n"
   << "Excluded " << inconsistentRecs+duplicateRecs
   << "/" << totalRecords << " records.\n"
-  << "Inconsistent records: " << std::setw(1) << inconsistentRecs << std::endl
+  << "Inconsistent records: " << std::setw(4) << inconsistentRecs << std::endl
   << "Duplicate records:" << std::setw(8) << duplicateRecs << std::endl;
 
 
