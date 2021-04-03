@@ -7,6 +7,8 @@ OBJS	= main.o BloomFilter.o SkipList.o List.o HashTable.o Person.o Record.o Viru
 SCRIPTS = testFile.sh
 LDLIBS	=
 TARGET	= vaccineMonitor
+INFILE	= citizenRecordsFile # Application input File
+RUNSIZE	= 1000 # Bloomfilter size in bytes
 
 $(TARGET): $(OBJS)
 	$(CPP) -g $(OBJS) -o $@ $(LDLIBS)
@@ -48,10 +50,10 @@ count:
 	wc -l -w $(SOURCE) $(HEADER) $(SCRIPTS)
 
 run:
-	./$(TARGET) -c citizenRecordsFile -b 1000
+	./$(TARGET) -c $(INFILE) -b $(RUNSIZE)
 
 valgrind:
-	valgrind --show-leak-kinds=all --leak-check=full --show-reachable=yes --track-origins=yes ./$(TARGET) -c citizenRecordsFile -b 1000
+	valgrind --leak-check=full --show-leak-kinds=all --show-reachable=yes --track-origins=yes ./$(TARGET) -c $(INFILE) -b $(RUNSIZE)
 
 help:
 	@echo Options:
