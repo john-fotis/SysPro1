@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 #define DEFAULT_LEVELS 5
-#define PROBABILITY 0.25
+#define PROBABILITY 0.5
 
 static bool seeded = false;
 
@@ -43,7 +43,7 @@ private:
 
   void deleteNode(skipNode *node) {
     if (!node) return;
-    delete [] node->nextAtLevel;
+    delete[] node->nextAtLevel;
     delete node;
   }
 
@@ -82,7 +82,7 @@ public:
   void insert(const T data);
   void remove(const T data);
 
-  bool empty() const { return (size == 0); }
+  bool empty() const { return !size; }
   void print() const;
   T *getNode(unsigned int pos);
   T *search(const T data) const;

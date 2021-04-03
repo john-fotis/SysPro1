@@ -252,13 +252,13 @@ void printAllStatisticsByAge(VirusCountryEntry *entryPtr) {
   if (!entryPtr) return;
 
   float result1, result2, result3, result4;
-  entryPtr->getTotal_0_20() != 0 ?
+  entryPtr->getTotal_0_20() ?
   result1=(100*(float)entryPtr->vac_0_20()/entryPtr->getTotal_0_20()) : result1=0;
-  entryPtr->getTotal_20_40() != 0 ?
+  entryPtr->getTotal_20_40() ?
   result2=(100*(float)entryPtr->vac_20_40()/entryPtr->getTotal_20_40()) : result2=0;
-  entryPtr->getTotal_40_60() != 0 ?
+  entryPtr->getTotal_40_60() ?
   result3=(100*(float)entryPtr->vac_40_60()/entryPtr->getTotal_40_60()) : result3=0;
-  entryPtr->getTotal_60_plus() != 0 ?
+  entryPtr->getTotal_60_plus() ?
   result4=(100*(float)entryPtr->vac_60_plus()/entryPtr->getTotal_60_plus()) : result4=0;
 
   std::cout << std::endl << entryPtr->getCountry().getName()
@@ -280,13 +280,13 @@ void printByAgeWithDates(VirusCountryEntry *entryPtr,
   if (!entryPtr) return;
 
   float result1, result2, result3, result4;
-  entryPtr->getTotal_0_20() != 0 ?
+  entryPtr->getTotal_0_20() ?
   result1=(100*(float)age_0_20/entryPtr->getTotal_0_20()) : result1=0;
-  entryPtr->getTotal_20_40() != 0 ?
+  entryPtr->getTotal_20_40() ?
   result2=(100*(float)age_20_40/entryPtr->getTotal_20_40()) : result2=0;
-  entryPtr->getTotal_40_60() != 0 ?
+  entryPtr->getTotal_40_60() ?
   result3=(100*(float)age_40_60/entryPtr->getTotal_40_60()) : result3=0;
-  entryPtr->getTotal_60_plus() != 0 ?
+  entryPtr->getTotal_60_plus() ?
   result4=(100*(float)age_60_plus/entryPtr->getTotal_60_plus()) : result4=0;
 
   std::cout << std::endl << entryPtr->getCountry().getName()
@@ -316,20 +316,20 @@ int main (int argc, char *argv[]) {
   }
 
   line.assign(argv[1]);
-  if (line.compare("-c") != 0) {
+  if (line.compare("-c")) {
     std::cerr << "Invalid record file identifier.\n";
     std::cout << "Input should be like: " << INPUT;
     exit(-1);
   }
 
-  if ((stat(argv[2], &fileName) != 0)) {
+  if ((stat(argv[2], &fileName))) {
     std::cerr << "Input file not found.\n";
     std::cout << "Input should be like: " << INPUT;
     exit(-1);
   }
 
   line.assign(argv[3]);
-  if (line.compare("-b") != 0) {
+  if (line.compare("-b")) {
     std::cerr << "Invalid bloom filter identifier.\n";
     std::cout << "Input should be like: " << INPUT;
     exit(-1);
@@ -514,7 +514,7 @@ int main (int argc, char *argv[]) {
                 // Print the results for the country
                 std::cout << std::setw(11) << countryPtr->getName() << " "
                   << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
-                if (entryPtr->getTotalRegistered() != 0)
+                if (entryPtr->getTotalRegistered())
                   std::cout << std::fixed << std::setprecision(2)
                   << (100*(float)entryPtr->getTotalVaccinated()\
                   /entryPtr->getTotalRegistered()) << "%\n";
@@ -541,7 +541,7 @@ int main (int argc, char *argv[]) {
               // Print the results for the country
               std::cout << countryPtr->getName() << " "
                 << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
-              if (entryPtr->getTotalRegistered() != 0)
+              if (entryPtr->getTotalRegistered())
                 std::cout << std::fixed << std::setprecision(2)
                 << (100*(float)entryPtr->getTotalVaccinated()\
                 /entryPtr->getTotalRegistered()) << "%\n";
@@ -590,7 +590,7 @@ int main (int argc, char *argv[]) {
                 }
                 // Print the results for the country
                 std::cout << countryPtr->getName() << " ";
-                if (entryPtr->getTotalRegistered() != 0)
+                if (entryPtr->getTotalRegistered())
                   std::cout << std::setw(5) << totalVaccinated << " "
                   << std::fixed << std::setprecision(2)
                   << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
@@ -639,7 +639,7 @@ int main (int argc, char *argv[]) {
               }
               // Print the results for the country
               std::cout << countryPtr->getName() << " ";
-              if (entryPtr->getTotalRegistered() != 0)
+              if (entryPtr->getTotalRegistered())
                 std::cout << std::setw(5) << totalVaccinated << " "
                 << std::fixed << std::setprecision(2)
                 << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
