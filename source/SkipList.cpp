@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "SkipList.hpp"
-#include "Record.hpp"
+#include "../header/SkipList.hpp"
+#include "../header/Record.hpp"
 
 template <typename T>
 SkipList<T>::SkipList(const SkipList &l)
@@ -90,7 +90,7 @@ void SkipList<T>::remove(const T data) {
 template <typename T>
 void SkipList<T>::print() const {
   for (int i = maxLevel-1; i >= 0; i--) {
-    // Skip the arbitary head node as its value is negative
+    // Skip the arbitrary head node as its value is negative
     skipNode *temp = head->nextAtLevel[i];
     std::cout << "Level\t" << i << ": ";
     while (temp) {

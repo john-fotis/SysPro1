@@ -1,4 +1,4 @@
-#include "Person.hpp"
+#include "../header/Person.hpp"
 
 Person::Person(const Person &person) {
   if (this == &person) return;

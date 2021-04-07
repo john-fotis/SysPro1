@@ -1,11 +1,11 @@
 #include <iostream>
 
-#include "List.hpp"
-#include "Person.hpp"
-#include "Virus.hpp"
-#include "Country.hpp"
-#include "Record.hpp"
-#include "VirusCountryEntry.hpp"
+#include "../header/List.hpp"
+#include "../header/Person.hpp"
+#include "../header/Virus.hpp"
+#include "../header/Country.hpp"
+#include "../header/Record.hpp"
+#include "../header/VirusCountryEntry.hpp"
 
 template <typename T>
 void List<T>::insertFirst(T data) {

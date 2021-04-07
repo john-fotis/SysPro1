@@ -1,4 +1,4 @@
-#include "Record.hpp"
+#include "../header/Record.hpp"
 
 Record::Record(const Record &record) {
   if (this == &record) return;

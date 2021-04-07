@@ -56,7 +56,7 @@ private:
     }
   }
 
-  // Deletes all nodes except the arbitary head node
+  // Deletes all nodes except the arbitrary head node
   void flush() { while (!empty()) remove(getFirst()); }
 
 public:

@@ -4,17 +4,17 @@
 #include <cstdlib>
 #include <sys/stat.h>
 
-#include "StringLibrary.hpp"
-#include "List.hpp"
-#include "HashTable.hpp"
-#include "BloomFilter.hpp"
-#include "SkipList.hpp"
-#include "Date.hpp"
-#include "Person.hpp"
-#include "Record.hpp"
-#include "Virus.hpp"
-#include "Country.hpp"
-#include "VirusCountryEntry.hpp"
+#include "../header/BloomFilter.hpp"
+#include "../header/Country.hpp"
+#include "../header/Date.hpp"
+#include "../header/HashTable.hpp"
+#include "../header/List.hpp"
+#include "../header/Person.hpp"
+#include "../header/Record.hpp"
+#include "../header/SkipList.hpp"
+#include "../header/StringLibrary.hpp"
+#include "../header/Virus.hpp"
+#include "../header/VirusCountryEntry.hpp"
 
 #define CITIZEN_REGISTRY_SIZE 1000
 #define VIRUS_COUNTRY_ENTRIES 100
@@ -511,14 +511,16 @@ int main (int argc, char *argv[]) {
                 entryPtr = db.entriesTable.search(
                   virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
                 );
-                // Print the results for the country
-                std::cout << std::setw(11) << countryPtr->getName() << " "
-                  << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
-                if (entryPtr->getTotalRegistered())
-                  std::cout << std::fixed << std::setprecision(2)
-                  << (100*(float)entryPtr->getTotalVaccinated()\
-                  /entryPtr->getTotalRegistered()) << "%\n";
-                else std::cout << "0.00%\n";
+                if (entryPtr) {
+                  // Print the results for the country
+                  std::cout << std::setw(11) << countryPtr->getName() << " "
+                    << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
+                  if (entryPtr->getTotalRegistered())
+                    std::cout << std::fixed << std::setprecision(2)
+                    << (100*(float)entryPtr->getTotalVaccinated()\
+                    /entryPtr->getTotalRegistered()) << "%\n";
+                  else std::cout << "0.00%\n";
+                }
               }
             } else std::cerr << "\nNO SUCH VIRUS FOUND\n";
             break;
@@ -538,14 +540,16 @@ int main (int argc, char *argv[]) {
               entryPtr = db.entriesTable.search(
                 virusPtr->getName() + countryPtr->getName(), obj.vCountryEntry
               );
-              // Print the results for the country
-              std::cout << countryPtr->getName() << " "
-                << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
-              if (entryPtr->getTotalRegistered())
-                std::cout << std::fixed << std::setprecision(2)
-                << (100*(float)entryPtr->getTotalVaccinated()\
-                /entryPtr->getTotalRegistered()) << "%\n";
-              else std::cout << "0.00%\n";
+              if (entryPtr) {
+                // Print the results for the country
+                std::cout << countryPtr->getName() << " "
+                  << std::setw(5) << entryPtr->getTotalVaccinated() << " ";
+                if (entryPtr->getTotalRegistered())
+                  std::cout << std::fixed << std::setprecision(2)
+                  << (100*(float)entryPtr->getTotalVaccinated()\
+                  /entryPtr->getTotalRegistered()) << "%\n";
+                else std::cout << "0.00%\n";
+              }
             }
             else if (!countryPtr && !virusPtr) std::cerr << "\nINVALID COUNTRY AND VIRUS NAME\n"; 
             else if (!countryPtr) std::cerr << "\nNO SUCH COUNTRY FOUND\n";
@@ -588,13 +592,15 @@ int main (int argc, char *argv[]) {
                       totalVaccinated++;
                   }
                 }
-                // Print the results for the country
-                std::cout << countryPtr->getName() << " ";
-                if (entryPtr->getTotalRegistered())
-                  std::cout << std::setw(5) << totalVaccinated << " "
-                  << std::fixed << std::setprecision(2)
-                  << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
-                else std::cout << "0.00%\n";
+                if (entryPtr) {
+                  // Print the results for the country
+                  std::cout << countryPtr->getName() << " ";
+                  if (entryPtr->getTotalRegistered())
+                    std::cout << std::setw(5) << totalVaccinated << " "
+                    << std::fixed << std::setprecision(2)
+                    << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+                  else std::cout << "0.00%\n";
+                }
               }
             }
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";
@@ -637,13 +643,15 @@ int main (int argc, char *argv[]) {
                     totalVaccinated++;
                 }
               }
-              // Print the results for the country
-              std::cout << countryPtr->getName() << " ";
-              if (entryPtr->getTotalRegistered())
-                std::cout << std::setw(5) << totalVaccinated << " "
-                << std::fixed << std::setprecision(2)
-                << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
-              else std::cout << "0.00%\n";
+              if (entryPtr) {
+                // Print the results for the country
+                std::cout << countryPtr->getName() << " ";
+                if (entryPtr->getTotalRegistered())
+                  std::cout << std::setw(5) << totalVaccinated << " "
+                  << std::fixed << std::setprecision(2)
+                  << (100*(float)totalVaccinated/entryPtr->getTotalRegistered()) << "%\n";
+                else std::cout << "0.00%\n";
+              }
             }
             else if (!virusPtr && !countryPtr) std::cerr << "\nINVALID VIRUS AND COUNTRY NAME\n";
             else if (!virusPtr) std::cerr << "\nNO SUCH VIRUS FOUND\n";

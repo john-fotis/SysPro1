@@ -1,4 +1,4 @@
-#include "VirusCountryEntry.hpp"
+#include "../header/VirusCountryEntry.hpp"
 
 VirusCountryEntry::VirusCountryEntry(const VirusCountryEntry &entry) {
   if (this == &entry) return;
