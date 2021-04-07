@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "SkipList.hpp"
-#include "Record.hpp"
+#include "../header/SkipList.hpp"
+#include "../header/Record.hpp"
 
 template <typename T>
 SkipList<T>::SkipList(const SkipList &l)

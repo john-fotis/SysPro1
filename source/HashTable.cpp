@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "HashTable.hpp"
-#include "Person.hpp"
-#include "VirusCountryEntry.hpp"
+#include "../header/HashTable.hpp"
+#include "../header/Person.hpp"
+#include "../header/VirusCountryEntry.hpp"
 
 template <typename T>
 void HashTable<T>::insert(std::string key, T node) {

@@ -1,4 +1,4 @@
-#include "Virus.hpp"
+#include "../header/Virus.hpp"
 
 Virus::Virus(const Virus &virus) {
   if (this == &virus) return;

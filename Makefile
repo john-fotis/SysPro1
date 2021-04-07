@@ -1,12 +1,14 @@
 # ========== Run "make help" to see the available commands ==========
 CPP	= g++
 FLAGS	= -g -c -Wall -std=c++0x
-HEADER	= BloomFilter.hpp SkipList.hpp List.hpp HashTable.hpp Person.hpp Record.hpp Date.hpp StringLibrary.hpp hashFunctions.hpp Virus.hpp Country.hpp VirusCountryEntry.hpp
-SOURCE	= main.cpp BloomFilter.cpp SkipList.cpp List.cpp HashTable.cpp Person.cpp Record.cpp Virus.cpp Country.cpp VirusCountryEntry.cpp
-OBJS	= main.o BloomFilter.o SkipList.o List.o HashTable.o Person.o Record.o Virus.o Country.o VirusCountryEntry.o
+HEADER	= $(HDR)BloomFilter.hpp $(HDR)SkipList.hpp $(HDR)List.hpp $(HDR)HashTable.hpp $(HDR)Person.hpp $(HDR)Record.hpp $(HDR)Date.hpp $(HDR)StringLibrary.hpp $(HDR)hashFunctions.hpp $(HDR)Virus.hpp $(HDR)Country.hpp $(HDR)VirusCountryEntry.hpp
+SOURCE	= $(SRC)main.cpp $(SRC)BloomFilter.cpp $(SRC)SkipList.cpp $(SRC)List.cpp $(SRC)HashTable.cpp $(SRC)Person.cpp $(SRC)Record.cpp $(SRC)Virus.cpp $(SRC)Country.cpp $(SRC)VirusCountryEntry.cpp
+OBJS	= $(SRC)main.o $(SRC)BloomFilter.o $(SRC)SkipList.o $(SRC)List.o $(SRC)HashTable.o $(SRC)Person.o $(SRC)Record.o $(SRC)Virus.o $(SRC)Country.o $(SRC)VirusCountryEntry.o
 SCRIPTS = testFile.sh
 LDLIBS	=
 TARGET	= vaccineMonitor
+HDR = ./header/
+SRC = ./source/
 INFILE	= citizenRecordsFile # Application input File
 RUNSIZE	= 1000 # Bloomfilter size in bytes
 
@@ -44,7 +46,7 @@ VirusCountryEntry: VirusCountryEntry.cpp
 	$(CPP) $(FLAGS) VirusCountryEntry.cpp
 
 clean:
-	rm -f *.o $(OBJS) $(TARGET)
+	rm -f $(SRC)*.o $(OBJS) $(TARGET)
 
 count:
 	wc -l -w $(SOURCE) $(HEADER) $(SCRIPTS)

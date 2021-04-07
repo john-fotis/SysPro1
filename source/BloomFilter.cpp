@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "BloomFilter.hpp"
-#include "hashFunctions.hpp"
+#include "../header/BloomFilter.hpp"
+#include "../header/hashFunctions.hpp"
 
 BloomFilter::BloomFilter(const BloomFilter &filter) {
   if (this == &filter) return;

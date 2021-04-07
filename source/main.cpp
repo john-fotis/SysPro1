@@ -4,17 +4,17 @@
 #include <cstdlib>
 #include <sys/stat.h>
 
-#include "StringLibrary.hpp"
-#include "List.hpp"
-#include "HashTable.hpp"
-#include "BloomFilter.hpp"
-#include "SkipList.hpp"
-#include "Date.hpp"
-#include "Person.hpp"
-#include "Record.hpp"
-#include "Virus.hpp"
-#include "Country.hpp"
-#include "VirusCountryEntry.hpp"
+#include "../header/BloomFilter.hpp"
+#include "../header/Country.hpp"
+#include "../header/Date.hpp"
+#include "../header/HashTable.hpp"
+#include "../header/List.hpp"
+#include "../header/Person.hpp"
+#include "../header/Record.hpp"
+#include "../header/SkipList.hpp"
+#include "../header/StringLibrary.hpp"
+#include "../header/Virus.hpp"
+#include "../header/VirusCountryEntry.hpp"
 
 #define CITIZEN_REGISTRY_SIZE 1000
 #define VIRUS_COUNTRY_ENTRIES 100
