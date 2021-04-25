@@ -4,12 +4,17 @@
 
 duplicateRatio=50 # %
 vaccinateRatio=50 # %
-# We use a dictionary of first and last names
+outputFile=citizenRecordsFile
+# Dictionary files for viruses, countries, first and last names
+virusNameFile=virusesFile
+countryNameFile=countriesFile
+firstNameFile=firstNames
+lastNameFile=lastNames
+# Counters for dictionary of first and last names in case there's no file
 firstNamesNumber=100
 lastNamesNumber=100
-outputFile="citizenRecordsFile"
 # Above 10000, we can't ensure unique IDs
-maxID=10000
+maxUniqueID=10000
 
 
 ################### Function to write records to the output file
@@ -34,14 +39,13 @@ for arg in "$@"; do
   index=$(echo $arg | cut -f1 -d=)
   val=$(echo $arg | cut -f2 -d=)
   case $index in
-    virusesFile) virusList=$val;;
-    countriesFile) countryList=$val;;
+    $virusNameFile) virusList=$val;;
+    $countryNameFile) countryList=$val;;
     $3) lines=$val;;
     $4) duplicates=$val;;
     *)
   esac
 done
-
 
 ################### Check Input - Start
 
@@ -65,7 +69,7 @@ fi
 echo "Input was: $1, $2, $3, $4"
 
 if [[ $inputOk == false ]]; then
-  printf "Correct Usage:\n./testFile.sh [virusesFile] [countriesFile] [numLines] [duplicatesAllowed]\n"
+  printf "Correct Usage:\n./testFile.sh [$virusNameFile] [$countryNameFile] [numLines] [duplicatesAllowed]\n"
   exit 1
 fi
 
@@ -87,20 +91,32 @@ file="$countryList"
 while read line; do countryArray+=("$line"); done < $file
 printf "Country Records: %d\n" $((${#countryArray[@]}))
 
-# Generate 100 random firstnames to use as seed below
 declare -a firstNamesArray;
-for ((i=0; i<$firstNamesNumber; i++)) do
-  length=$(($RANDOM%10+3)) # Random length of 3-12 characters
-  firstNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
-done
+if [ -f "$firstNameFile" ]; then
+  # Found the first names file
+  file="$firstNameFile"
+  while read line; do firstNamesArray+=("$line"); done < $file
+else
+  echo "First names file not found, generating random values"
+  for ((i=0; i<$firstNamesNumber; i++)) do
+    length=$(($RANDOM%10+3)) # Random length of 3-12 characters
+    firstNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
+  done
+fi
 printf "First names:\t %d\n" $((${#firstNamesArray[@]}))
 
-# Generate 100 random lastNames to use as seed below
 declare -a lastNamesArray;
-for ((i=0; i<$lastNamesNumber; i++)) do
-  length=$(($RANDOM%10+3)) # Random length of 3-12 characters
-  lastNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
-done
+if [ -f "$lastNameFile" ]; then
+  # Found the last names file
+  file="$lastNameFile"
+  while read line; do lastNamesArray+=("$line"); done < $file
+else
+  echo "Last names file not found, generating random values"
+  for ((i=0; i<$lastNamesNumber; i++)) do
+    length=$(($RANDOM%10+3)) # Random length of 3-12 characters
+    lastNamesArray+=("$(tr -dc A-Z </dev/urandom | head -c $length)")
+  done
+fi
 printf "Last names:\t %d\n" $((${#lastNamesArray[@]}))
 
 ################### Records' data seed arrays - End
@@ -114,15 +130,15 @@ touch $outputFile
 
 # Array of unused IDs
 declare -a unusedIdsArray;
-availableIdAmount=$maxID
+availableIdAmount=$maxUniqueID
 
 if [[ $duplicates -eq 0 ]]; then ### Case: Avoid duplicate IDs
 
   # Fill up the unused ID array with all possible unused IDs (0-9999)
-  for ((i=0; i<$maxID; i++)) do unusedIdsArray+=($i); done
+  for ((i=0; i<$maxUniqueID; i++)) do unusedIdsArray+=($i); done
 
   # Figure out if requested lines are more than the unique IDs
-  [[ $lines -gt $maxID ]] && loops=$maxID || loops=$lines
+  [[ $lines -gt $maxUniqueID ]] && loops=$maxUniqueID || loops=$lines
 
   for ((counter=0; counter<$loops; counter++)) do
     # Find a random index in the unused IDs array and claim its value
@@ -148,7 +164,7 @@ if [[ $duplicates -eq 0 ]]; then ### Case: Avoid duplicate IDs
 
   # If we have to produce more records than the unique IDs
   # we will fill up the rest with duplicates of the first 10K records
-  [[ $loops -eq $lines ]] && remainingLoops=0 || remainingLoops=$(($lines-$maxID))
+  [[ $loops -eq $lines ]] && remainingLoops=0 || remainingLoops=$(($lines-$maxUniqueID))
   for ((counter=0; counter<$remainingLoops; counter++)) do
     # We read a line from the output file that we have already written at least one record
     line=$(shuf -n 1 $outputFile)
@@ -175,7 +191,7 @@ else ### Case: Cause duplicate IDs on purpose based on defined possibility
     if [[ "$((RANDOM%100))" -gt $duplicateRatio || $counter -lt 1 ]]; then
     ### Case: Generate an original record
       # All variables here are initialized randomly
-      id=$(($RANDOM%$maxID))
+      id=$(($RANDOM%$maxUniqueID))
       firstName=${firstNamesArray[(($RANDOM % ${#firstNamesArray[@]}))]}
       lastName=${lastNamesArray[(($RANDOM % ${#lastNamesArray[@]}))]}
       country=${countryArray[(($RANDOM % ${#countryArray[@]}))]}
