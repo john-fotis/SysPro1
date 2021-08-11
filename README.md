@@ -6,6 +6,7 @@ This project's main goal is to practice on multiple Data Structures in C or C++ 
 ## Requirements:
 - Ubuntu-based linux distribution (Developed in Ubuntu 20.04 LTS)
 - GCC 7.5.0 or newer
+- GNU Make 4.2.1
 - Bash shell
 
 ## How to run:
