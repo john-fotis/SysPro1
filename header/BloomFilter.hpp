@@ -25,7 +25,7 @@ public:
   BloomFilter(unsigned int sz=100, int functions=16)
   : size(sz*BITS_IN_BYTE), hashFunctionsNumber(functions) {
     bitArray = new char[sz]; // Allocating in bytes!
-    for (int pos = 0; pos < size; pos++) reset(pos);
+    for (unsigned int pos = 0; pos < size; pos++) reset(pos);
   }
   ~BloomFilter() { delete[] bitArray; }
   BloomFilter(const BloomFilter &filter);

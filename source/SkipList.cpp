@@ -25,7 +25,7 @@ void SkipList<T>::insert(const T data) {
   // be affected by the insertion of the new node
   skipNode *previousAtLevel[maxLevel];
   // Initialize them all pointing to the tail (NULL)
-  for (int i = 0; i < maxLevel; i++)
+  for (unsigned int i = 0; i < maxLevel; i++)
     previousAtLevel[i] = tail;
 
   skipNode *temp = head;
@@ -59,7 +59,7 @@ void SkipList<T>::remove(const T data) {
   // be affected by the removal of the node
   skipNode *previousAtLevel[maxLevel];
   // Initialize them all pointing to the tail (NULL)
-  for (int i = 0; i < maxLevel; i++)
+  for (unsigned int i = 0; i < maxLevel; i++)
     previousAtLevel[i] = tail;
 
   skipNode *temp = head;

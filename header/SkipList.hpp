@@ -36,7 +36,7 @@ private:
     skipNode *node = new skipNode;
     node->data = data;
     node->nextAtLevel = new skipNode *[lvls];
-    for (int i = 0; i < lvls; i++)
+    for (unsigned int i = 0; i < lvls; i++)
       node->nextAtLevel[i] = tail;
     return node;
   }

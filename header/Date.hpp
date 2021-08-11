@@ -52,11 +52,11 @@ public:
       y = *args.getNode(2);
     }
 
-    for(int pos = 0; pos < d.length(); pos++)
+    for (unsigned int pos = 0; pos < d.length(); pos++)
       if (!std::isdigit(d[pos])) validDate = false;
-    for (int pos = 0; pos < m.length(); pos++)
+    for (unsigned int pos = 0; pos < m.length(); pos++)
       if (!std::isdigit(m[pos])) validDate = false;
-    for (int pos = 0; pos < y.length(); pos++)
+    for (unsigned int pos = 0; pos < y.length(); pos++)
       if (!std::isdigit(y[pos])) validDate = false;
 
     if (validDate) {

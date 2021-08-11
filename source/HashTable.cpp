@@ -28,7 +28,7 @@ T *HashTable<T>::search(std::string key, T node) {
 
 template <typename T>
 void HashTable<T>::print() const {
-  for (int bucket=0; bucket<size; bucket++) {
+  for (unsigned int bucket=0; bucket<size; bucket++) {
     if (!table[bucket].empty()) {
       std::cout << "|| Index " << bucket << " || ";
       table[bucket].print();

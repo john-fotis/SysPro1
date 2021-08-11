@@ -336,7 +336,7 @@ int main (int argc, char *argv[]) {
   }
 
   line.assign(argv[4]);
-  for (int i = 0; i < line.length(); i++) {
+  for (unsigned int i = 0; i < line.length(); i++) {
     if (isdigit(line[i]) == false) {
       std::cerr << "Invalid bloom filter size.\n";
       std::cout << "Input should be like: " << INPUT;
@@ -479,7 +479,7 @@ int main (int argc, char *argv[]) {
         else if (args.getSize() == 1) { // Case: /vaccineStatus citizenID
           obj.record.setID(myStoi(args.getFirst()));
           // Loop through all the known viruses
-          for (int i = 0; i < db.virusList.getSize(); i++) {
+          for (unsigned int i = 0; i < db.virusList.getSize(); i++) {
             virusPtr = db.virusList.getNode(i);
             obj.virus.setName(virusPtr->getName());
             std::cout << std::setw(11) << virusPtr->getName() << std::setw(5);
@@ -502,7 +502,7 @@ int main (int argc, char *argv[]) {
 
             if (virusPtr) {
               // Loop through all the known Countries
-              for (int i = 0; i < db.countryList.getSize(); i++) {
+              for (unsigned int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
                 // Find the right virus-country entry in the hashtable
                 // in order to retrieve the statistics.
@@ -565,7 +565,7 @@ int main (int argc, char *argv[]) {
 
             if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // Loop through all the known Countries
-              for (int i = 0; i < db.countryList.getSize(); i++) {
+              for (unsigned int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
                 // Reset the vaccinated citizens counter for this country
                 totalVaccinated = 0;
@@ -577,7 +577,7 @@ int main (int argc, char *argv[]) {
                 );
                 // We will check every positive record of this virus
                 // and country and make sure its within the given dates
-                for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
+                for (unsigned int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                   recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                   // Validate the record's dates
                   if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
@@ -628,7 +628,7 @@ int main (int argc, char *argv[]) {
               );
               // We will check every positive record of this virus
               // and country and make sure its within the given dates
-              for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
+              for (unsigned int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                 recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                 // Validate the record's dates
                 if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
@@ -675,7 +675,7 @@ int main (int argc, char *argv[]) {
             virusPtr = db.virusList.search(obj.virus);
             if (virusPtr) {
               // Loop through all the known Countries
-              for (int i = 0; i < db.countryList.getSize(); i++) {
+              for (unsigned int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
                 // Find the right virus-country entry in the hashtable
                 // in order to retrieve the statistics.
@@ -719,7 +719,7 @@ int main (int argc, char *argv[]) {
 
             if (virusPtr && obj.date1.valid() && obj.date2.valid() && (obj.date1<=obj.date2)) {
               // Loop through all the known Countries
-              for (int i = 0; i < db.countryList.getSize(); i++) {
+              for (unsigned int i = 0; i < db.countryList.getSize(); i++) {
                 countryPtr = db.countryList.getNode(i);
                 // We locate the corresponting virus-country entry in order
                 // to get the total vaccinated persons per age-category
@@ -731,7 +731,7 @@ int main (int argc, char *argv[]) {
                 age_0_20 = age_20_40 = age_40_60 = age_60_plus = 0;
                 // We will check every positive record of this virus and make
                 // sure its within the given dates and belongs to this country
-                for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
+                for (unsigned int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                   recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                   // Validate the record's dates
                   if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
@@ -781,7 +781,7 @@ int main (int argc, char *argv[]) {
               age_0_20 = age_20_40 = age_40_60 = age_60_plus = 0;
               // We will check every positive record of this virus and make
               // sure its within the given dates and belongs to this country
-              for (int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
+              for (unsigned int recNum = 0; recNum < virusPtr->getVaccinatedListSize(); recNum++) {
                 recordPtr = virusPtr->getPositiveRecordNumber(recNum);
                 // Validate the record's dates
                 if (recordPtr->getDate()>=obj.date1 && recordPtr->getDate()<=obj.date2) {
@@ -947,7 +947,7 @@ int main (int argc, char *argv[]) {
 
         if (virusPtr) {
           // Loop through the non vaccinated skip list of the desired virus
-          for (int i = 0; i < virusPtr->getNonVaccinatedListSize(); i++) {
+          for (unsigned int i = 0; i < virusPtr->getNonVaccinatedListSize(); i++) {
             // Find each person's ID to retrieve his rest data from the citizen registry
             idPtr = virusPtr->getNegativeRecordNumber(i);
             recInfo.idStr = toString(*idPtr);

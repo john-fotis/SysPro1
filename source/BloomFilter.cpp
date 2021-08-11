@@ -30,7 +30,7 @@ void BloomFilter::insert(const std::string &input) {
   // Insert input if we know it's NOT already present
   if (!check(input)) {
     unsigned long hash = 0;
-    for (int i = 0; i < hashFunctionsNumber; i++) {
+    for (unsigned int i = 0; i < hashFunctionsNumber; i++) {
       hash = hash_i((unsigned char *)input.c_str(), i);
       set(hash % size);
     }
@@ -40,7 +40,7 @@ void BloomFilter::insert(const std::string &input) {
 bool BloomFilter::check(const std::string &input) {
   bool found = true;
   unsigned long hash = 0;
-  for (int i = 0; i < hashFunctionsNumber; i++) {
+  for (unsigned int i = 0; i < hashFunctionsNumber; i++) {
     hash = hash_i((unsigned char *)input.c_str(), i);
     found = found && checkBit(hash % size);
   }
@@ -48,7 +48,7 @@ bool BloomFilter::check(const std::string &input) {
 }
 
 void BloomFilter::arrayStatus() const {
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     std::cout << (checkBit(i) == true) << " ";
   std::cout << std::endl;
 }
