@@ -9,50 +9,38 @@ LDLIBS	=
 TARGET	= vaccineMonitor
 HDR = ./header/
 SRC = ./source/
-INFILE	= citizenRecordsFile # Application input File
-RUNSIZE	= 1000 # Bloomfilter size in bytes
+
+# Run parameters
+VFILE	= virusesFile
+# script viruses file
+CFILE	= countriesFile
+# script vountries file
+NUMRECS	= 10000
+# number of records to be produced by script
+DUPFLAG	= 0
+# 0 for non duplicates, non-zero for duplicates
+INFILE	= citizenRecordsFile
+# Application input File
+RUNSIZE	= 1000
+# Bloomfilter size in bytes
 
 $(TARGET): $(OBJS)
 	$(CPP) -g $(OBJS) -o $@ $(LDLIBS)
-
-main: main.cpp
-	$(CPP) $(FLAGS) main.cpp
-
-BloomFilter: BloomFilter.cpp
-	$(CPP) $(FLAGS) BloomFilter.cpp
-
-SkipList: SkipList.cpp
-	$(CPP) $(FLAGS) SkipList.cpp
-
-List: List.cpp
-	$(CPP) $(FLAGS) List.cpp
-
-HashTable: HashTable.cpp
-	$(CPP) $(FLAGS) HashTable.cpp
-
-Person: Person.cpp
-	$(CPP) $(FLAGS) Person.cpp
-
-Record: Record.cpp
-	$(CPP) $(FLAGS) Record.cpp
-
-Virus: Virus.cpp
-	$(CPP) $(FLAGS) Virus.cpp
-
-Country: Country.cpp
-	$(CPP) $(FLAGS) Country.cpp
-
-VirusCountryEntry: VirusCountryEntry.cpp
-	$(CPP) $(FLAGS) VirusCountryEntry.cpp
+	
+%.o: %.cpp
+	$(CPP) $(FLAGS) -c $< -o $@
 
 clean:
-	rm -f $(SRC)*.o $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)
 
 count:
 	wc -l -w $(SOURCE) $(HEADER) $(SCRIPTS)
 
 run:
 	./$(TARGET) -c $(INFILE) -b $(RUNSIZE)
+
+scriptRun:
+	./$(SCRIPTS) $(VFILE) $(CFILE) $(NUMRECS) $(DUPFLAG)
 
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --show-reachable=yes --track-origins=yes ./$(TARGET) -c $(INFILE) -b $(RUNSIZE)
