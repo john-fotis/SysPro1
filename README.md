@@ -9,7 +9,7 @@ This project's main goal is to practice on multiple Data Structures in C or C++ 
 - Bash shell
 
 ## How to run:
-You can run everything, in the root path of the project, using the Makefile. Type `make help` for all the available options. You can also run both the script and application with the appropriate make rules. All the run parameters can be changed through the make file.
+You can run everything, in the root path of the project, using the [Makefile](https://github.com/john-fotis/SysPro1/blob/main/Makefile). Type `make help` for all the available options. You can also run both the script and application with the appropriate make rules. All the run parameters can be changed through the [Makefile](https://github.com/john-fotis/SysPro1/blob/main/Makefile).
 
 ## Bash-Script:
   #### You first need to produce a [citizenRecordsFile](https://github.com/john-fotis/SysPro1/blob/main/citizenRecordsFile) if not already there. For this purpose, you need [virusesFile](https://github.com/john-fotis/SysPro1/blob/main/virusesFile), [countriesFile](https://github.com/john-fotis/SysPro1/blob/main/countriesFile), [firstNames](https://github.com/john-fotis/SysPro1/blob/main/firstNames) and [lastNames](https://github.com/john-fotis/SysPro1/blob/main/lastNames). The names of these files are case-sensitive, though, can be changed in the [testFile.sh](https://github.com/john-fotis/SysPro1/blob/main/testFile.sh). First and Last names dictionaries are non-mandatory, however, if abscent, the script will produce records with random citizen names using only characters A-Z.
