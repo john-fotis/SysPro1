@@ -1,5 +1,8 @@
 # This is the first of the total three assignments for the [Systems Programming Course](http://cgi.di.uoa.gr/~antoulas/k24/) during my B.Sc in Informatics and Telecommunications.
 
+## Description:
+This project's main goal is to practice on multiple Data Structures in C or C++ programming language without the use of STL and organise all the database information in such way, as to minimize data-overlap and repetition.
+
 ## Requirements:
 - Ubuntu-based linux distribution (Developed in Ubuntu 20.04 LTS)
 - GCC 7.5.0 or newer
